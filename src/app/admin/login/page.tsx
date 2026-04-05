@@ -79,9 +79,7 @@ export default function AdminLoginPage() {
             </button>
           </div>
 
-          <div className="text-center text-sm text-gray-500">
-            <p>管理员密码：admin123</p>
-          </div>
+
         </form>
       </div>
     </div>
