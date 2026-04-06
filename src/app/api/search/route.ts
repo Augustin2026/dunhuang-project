@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       .from('documents')
       .select('*', { count: 'exact' })
       .eq('status', 'approved')
-      .or(`title.ilike.%${searchTerm}%,document_number.ilike.%${searchTerm}%,period.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%,page_number.ilike.%${searchTerm}%,comment.ilike.%${searchTerm}%`)
+      .ilike('title', `%${searchTerm}%`)
       .range(offset, offset + limit - 1)
 
     if (docsError) {
