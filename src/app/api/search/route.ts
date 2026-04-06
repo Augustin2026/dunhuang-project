@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
+// 明确标记为动态路由，因为使用了 nextUrl.searchParams
+export const dynamic = 'force-dynamic'
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
@@ -12,9 +15,8 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
-    const searchTerm = searchParams.get('q') || ''
-    const page = parseInt(searchParams.get('page') || '1')
+    const searchTerm = request.nextUrl.searchParams.get('q') || ''
+    const page = parseInt(request.nextUrl.searchParams.get('page') || '1')
     const limit = 20
     const offset = (page - 1) * limit
 
