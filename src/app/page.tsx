@@ -228,7 +228,8 @@ const Page = () => {
         .from('feedbacks')
         .insert({
           document_id: selectedDoc.id,
-          feedback: feedbackText,
+          document_title: selectedDoc.title,
+          content: feedbackText,
           status: 'pending'
         })
         .select()
