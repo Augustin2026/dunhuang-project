@@ -57,7 +57,7 @@ body {
   }
   
   .input-field {
-    @apply w-full px-5 py-4 bg-white border border-paper-200 rounded-xl text-ink-800 placeholder-ink-700/40 focus:outline-none focus:ring-2 focus:ring-accent-bronze/30 focus:border-accent-bronze/50 transition-all duration-200;
+    @apply w-full px-5 py-4 bg-white border border-paper-200 rounded-xl text-ink-800 placeholder-ink-700/40 focus:outline-none focus:ring-2 focus:ring-accent-bronze/30 focus:border-accent-bronze/50 transition-all duration-200 font-serif;
   }
   
   .section-title {

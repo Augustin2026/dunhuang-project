@@ -27,7 +27,7 @@ module.exports = {
         },
       },
       fontFamily: {
-        serif: ['Noto Serif SC', 'Source Han Serif SC', 'Source Han Serif CN', 'serif'],
+        serif: ['Noto Serif SC', 'SimSun-ExtB', 'MingLiU-ExtB', 'HanaMinA', 'HanaMinB', 'Source Han Serif SC', 'Source Han Serif CN', 'serif'],
         sans: ['Inter', 'Noto Sans SC', 'system-ui', 'sans-serif'],
       },
       spacing: {

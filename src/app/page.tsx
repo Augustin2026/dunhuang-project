@@ -506,8 +506,11 @@ const Page = () => {
             <ReactQuill
               value={content}
               onChange={setContent}
-              className="border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              className="border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent font-serif"
             />
+            <p className="mt-2 text-xs text-gray-400">
+              💡 提示：若部分敦煌/吐鲁番异体字显示为空白方块，这是由于您的设备字库不全。建议安装学术界通用的【花园明朝 (Hanazono Mincho)】或使用部件拼字法进行录入。
+            </p>
           </div>
           <div className="mb-6">
             <label className="block text-sm font-medium text-ink-700 mb-1">
