@@ -4,7 +4,7 @@ import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 const notoSansSC = Noto_Serif_SC({
-  subsets: ['latin', 'chinese-simplified'],
+  subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   display: 'swap',
   fallback: ['serif', 'SimSun', 'STSong', 'NSimSun']
