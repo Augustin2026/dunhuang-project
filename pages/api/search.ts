@@ -1,8 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { createClient } from '@supabase/supabase-js'
-
-// 明确标记为动态路由，因为使用了 nextUrl.searchParams
-export const dynamic = 'force-dynamic'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
@@ -13,15 +10,21 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-export async function GET(request: NextRequest) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'GET') {
+    res.status(405).json({ error: 'Method not allowed' })
+    return
+  }
+
   try {
-    const searchTerm = request.nextUrl.searchParams.get('q') || ''
-    const page = parseInt(request.nextUrl.searchParams.get('page') || '1')
+    const searchTerm = req.query.q as string || ''
+    const page = parseInt(req.query.page as string || '1')
     const limit = 20
     const offset = (page - 1) * limit
 
     if (!searchTerm.trim()) {
-      return NextResponse.json({ documents: [], dictionary: [], total: 0 }, { status: 200 })
+      res.status(200).json({ documents: [], dictionary: [], total: 0 })
+      return
     }
 
     const { data: docs, error: docsError, count: docsCount } = await supabase
@@ -33,7 +36,8 @@ export async function GET(request: NextRequest) {
 
     if (docsError) {
       console.error('搜索文献失败:', docsError)
-      return NextResponse.json({ error: '搜索文献失败', details: docsError }, { status: 500 })
+      res.status(500).json({ error: '搜索文献失败', details: docsError })
+      return
     }
 
     let dictionaryResults = []
@@ -55,18 +59,15 @@ export async function GET(request: NextRequest) {
       dictionaryResults = []
     }
 
-    return NextResponse.json(
-      {
-        documents: docs || [],
-        dictionary: dictionaryResults,
-        total: docsCount || 0,
-        page,
-        limit
-      },
-      { status: 200 }
-    )
+    res.status(200).json({
+      documents: docs || [],
+      dictionary: dictionaryResults,
+      total: docsCount || 0,
+      page,
+      limit
+    })
   } catch (error) {
     console.error('请求处理失败:', error)
-    return NextResponse.json({ error: '请求处理失败' }, { status: 500 })
+    res.status(500).json({ error: '请求处理失败' })
   }
 }
