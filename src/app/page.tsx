@@ -51,34 +51,25 @@ export default function Home() {
     setLoading(true)
     setShowResults(true)
 
-    const { data: docs, error: docsError } = await supabase
-      .from('documents')
-      .select('*')
-      .eq('status', 'approved')
-      .ilike('title', `%${searchTerm}%`)
-      .or(`ilike(document_number, %${searchTerm}%),ilike(period, %${searchTerm}%),ilike(content, %${searchTerm}%),ilike(page_number, %${searchTerm}%),ilike(comment, %${searchTerm}%)`)
+    try {
+      const response = await fetch(`/api/search?q=${encodeURIComponent(searchTerm)}&page=1`)
+      const data = await response.json()
 
-    if (docsError) {
-      console.error('搜索文献失败:', docsError)
+      if (data.error) {
+        console.error('搜索失败:', data.error)
+        setDocumentResults([])
+        setDictionaryResults([])
+      } else {
+        setDocumentResults(data.documents)
+        setDictionaryResults(data.dictionary)
+      }
+    } catch (error) {
+      console.error('搜索失败:', error)
       setDocumentResults([])
-    } else {
-      setDocumentResults(docs)
-    }
-
-    const { data: dict, error: dictError } = await supabase
-      .from('dictionary')
-      .select('*')
-      .ilike('word', `%${searchTerm}%`)
-      .or(`ilike(definition, %${searchTerm}%)`)
-
-    if (dictError) {
-      console.error('搜索词典失败:', dictError)
       setDictionaryResults([])
-    } else {
-      setDictionaryResults(dict)
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   function handleKeyPress(e: React.KeyboardEvent) {
