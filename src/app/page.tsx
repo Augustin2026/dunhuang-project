@@ -190,32 +190,32 @@ export default function Home() {
           </a>
         </div>
         
-        <div className="text-center max-w-4xl mx-auto mb-20">
-          <div className="mb-8">
-            <div className="decorative-line mx-auto mb-8"></div>
+        <div className="text-center max-w-4xl mx-auto mb-24">
+          <div className="mb-12">
+            <div className="decorative-line mx-auto mb-10"></div>
           </div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-semibold text-ink-900 mb-8 tracking-wide leading-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold mb-6 tracking-wide leading-tight gradient-text">
             敦煌吐鲁番出土文献检索系统
           </h1>
-          <p className="text-lg text-ink-700/80 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
+          <p className="text-lg text-ink-700/70 mb-16 max-w-2xl mx-auto leading-relaxed font-light">
             汇聚敦煌吐鲁番历史文献，为研究人员和爱好者提供便捷的文献访问方式
           </p>
           
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-3xl mx-auto">
             <div className="relative group">
               <input
                 type="text"
                 placeholder="搜索文献标题、编号、年代或内容..."
-                className="w-full px-6 py-5 pr-16 bg-white border border-paper-200 rounded-2xl text-ink-800 placeholder-ink-700/40 focus:outline-none focus:ring-2 focus:ring-accent-bronze/20 focus:border-accent-bronze/40 shadow-paper transition-all duration-300"
+                className="w-full px-8 py-6 pr-20 bg-white border border-paper-200 rounded-full text-ink-800 placeholder-ink-700/40 focus:outline-none focus:ring-3 focus:ring-accent-bronze/30 focus:border-accent-bronze/50 shadow-md transition-all duration-300 focus:shadow-lg"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={handleKeyPress}
               />
               <button
                 onClick={handleSearch}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-ink-800 text-white p-3 rounded-xl hover:bg-ink-900 transition-all duration-300 shadow-paper hover:shadow-paper-md active:scale-95"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-ink-800 text-white p-4 rounded-full hover:bg-ink-900 transition-all duration-300 shadow-md hover:shadow-lg active:scale-95"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-5 w-5">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </button>
