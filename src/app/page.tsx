@@ -15,6 +15,7 @@ const Page = () => {
   const [documentResults, setDocumentResults] = useState<any[]>([])
   const [dictionaryResults, setDictionaryResults] = useState<any[]>([])
   const [showResults, setShowResults] = useState(false)
+  const [searchType, setSearchType] = useState('global') // global, title, content, comment, document_number
 
   // 防抖处理
   useEffect(() => {
@@ -32,22 +33,22 @@ const Page = () => {
       event.preventDefault()
       // 从状态中获取搜索词
       const query = searchTerm
-      console.log('开始搜索，搜索词:', query)
-      
-      // 检查 query 是否是字符串类型
-      if (typeof query !== 'string' || !query.trim()) {
-        console.log('搜索词为空或不是字符串，取消搜索')
-        return
-      }
+      console.log('开始搜索，搜索词:', query, '搜索类型:', searchType)
+          
+          // 检查 query 是否是字符串类型
+          if (typeof query !== 'string' || !query.trim()) {
+            console.log('搜索词为空或不是字符串，取消搜索')
+            return
+          }
 
-      setLoading(true)
-      setShowResults(true)
-      console.log('设置加载状态为 true，显示结果为 true')
+          setLoading(true)
+          setShowResults(true)
+          console.log('设置加载状态为 true，显示结果为 true')
 
-      try {
-        const apiUrl = `/api/search?q=${encodeURIComponent(query)}&page=1`
-        console.log('发起 API 请求，URL:', apiUrl)
-        const response = await fetch(apiUrl)
+          try {
+            const apiUrl = `/api/search?q=${encodeURIComponent(query)}&page=1&type=${searchType}`
+            console.log('发起 API 请求，URL:', apiUrl)
+            const response = await fetch(apiUrl)
         console.log('API 响应状态:', response.status)
         
         const data = await response.json()
@@ -76,22 +77,22 @@ const Page = () => {
     } else {
       // 处理字符串参数
       const query = typeof event === 'string' ? event : searchTerm
-      console.log('开始搜索，搜索词:', query)
-      
-      // 检查 query 是否是字符串类型
-      if (typeof query !== 'string' || !query.trim()) {
-        console.log('搜索词为空或不是字符串，取消搜索')
-        return
-      }
+      console.log('开始搜索，搜索词:', query, '搜索类型:', searchType)
+          
+          // 检查 query 是否是字符串类型
+          if (typeof query !== 'string' || !query.trim()) {
+            console.log('搜索词为空或不是字符串，取消搜索')
+            return
+          }
 
-      setLoading(true)
-      setShowResults(true)
-      console.log('设置加载状态为 true，显示结果为 true')
+          setLoading(true)
+          setShowResults(true)
+          console.log('设置加载状态为 true，显示结果为 true')
 
-      try {
-        const apiUrl = `/api/search?q=${encodeURIComponent(query)}&page=1`
-        console.log('发起 API 请求，URL:', apiUrl)
-        const response = await fetch(apiUrl)
+          try {
+            const apiUrl = `/api/search?q=${encodeURIComponent(query)}&page=1&type=${searchType}`
+            console.log('发起 API 请求，URL:', apiUrl)
+            const response = await fetch(apiUrl)
         console.log('API 响应状态:', response.status)
         
         const data = await response.json()
@@ -118,7 +119,7 @@ const Page = () => {
         console.log('设置加载状态为 false')
       }
     }
-  }, [searchTerm, setLoading, setShowResults, setDocumentResults, setDictionaryResults])
+  }, [searchTerm, searchType, setLoading, setShowResults, setDocumentResults, setDictionaryResults])
 
   // 当防抖搜索词变化时触发搜索
   useEffect(() => {
@@ -309,21 +310,55 @@ const Page = () => {
         <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-900 to-amber-600 mb-8">
           吐鲁番出土文献检索系统
         </h1>
-        <div className="relative max-w-3xl mx-auto">
-          <input
-            type="text"
-            placeholder="请输入关键词，如：高昌、佛经、文书..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyPress={handleKeyPress}
-            className="w-full px-6 py-4 pr-16 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent shadow-md"
-          />
-          <button
-            onClick={memoizedHandleSearch}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-ink-800 text-white p-4 rounded-full hover:bg-ink-900 transition-all duration-300 shadow-md hover:shadow-lg active:scale-95"
-          >
-            <Search size={20} />
-          </button>
+        <div className="max-w-3xl mx-auto">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="请输入关键词，如：高昌、佛经、文书..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={handleKeyPress}
+              className="w-full px-6 py-4 pr-16 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent shadow-md"
+            />
+            <button
+              onClick={memoizedHandleSearch}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-ink-800 text-white p-4 rounded-full hover:bg-ink-900 transition-all duration-300 shadow-md hover:shadow-lg active:scale-95"
+            >
+              <Search size={20} />
+            </button>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2 justify-center">
+            <button
+              onClick={() => setSearchType('global')}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${searchType === 'global' ? 'bg-ink-800 text-white shadow-md' : 'bg-gray-100 text-ink-700 hover:bg-gray-200'}`}
+            >
+              全局搜索
+            </button>
+            <button
+              onClick={() => setSearchType('title')}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${searchType === 'title' ? 'bg-ink-800 text-white shadow-md' : 'bg-gray-100 text-ink-700 hover:bg-gray-200'}`}
+            >
+              题目搜索
+            </button>
+            <button
+              onClick={() => setSearchType('content')}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${searchType === 'content' ? 'bg-ink-800 text-white shadow-md' : 'bg-gray-100 text-ink-700 hover:bg-gray-200'}`}
+            >
+              内容搜索
+            </button>
+            <button
+              onClick={() => setSearchType('comment')}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${searchType === 'comment' ? 'bg-ink-800 text-white shadow-md' : 'bg-gray-100 text-ink-700 hover:bg-gray-200'}`}
+            >
+              注释搜索
+            </button>
+            <button
+              onClick={() => setSearchType('document_number')}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${searchType === 'document_number' ? 'bg-ink-800 text-white shadow-md' : 'bg-gray-100 text-ink-700 hover:bg-gray-200'}`}
+            >
+              文书号搜索
+            </button>
+          </div>
         </div>
       </div>
 

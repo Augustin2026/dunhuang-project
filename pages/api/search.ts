@@ -36,17 +36,38 @@ function convertToTraditional(text: string): string {
 }
 
 // 生成包含简体和繁体的搜索条件
-function generateSearchConditions(searchTerm: string): string {
-  const traditionalTerm = convertToTraditional(searchTerm)
-  
-  // 如果搜索词和转换后的繁体相同，只需要一个条件
-  if (searchTerm === traditionalTerm) {
-    return `title.ilike.%${searchTerm}%,document_number.ilike.%${searchTerm}%,period.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%,comment.ilike.%${searchTerm}%`
+  function generateSearchConditions(searchTerm: string, searchType: string): string {
+    const traditionalTerm = convertToTraditional(searchTerm)
+    
+    // 根据搜索类型生成不同的搜索条件
+    switch (searchType) {
+      case 'title':
+        if (searchTerm === traditionalTerm) {
+          return `title.ilike.%${searchTerm}%`
+        }
+        return `title.ilike.%${searchTerm}%,title.ilike.%${traditionalTerm}%`
+      case 'content':
+        if (searchTerm === traditionalTerm) {
+          return `content.ilike.%${searchTerm}%`
+        }
+        return `content.ilike.%${searchTerm}%,content.ilike.%${traditionalTerm}%`
+      case 'comment':
+        if (searchTerm === traditionalTerm) {
+          return `comment.ilike.%${searchTerm}%`
+        }
+        return `comment.ilike.%${searchTerm}%,comment.ilike.%${traditionalTerm}%`
+      case 'document_number':
+        if (searchTerm === traditionalTerm) {
+          return `document_number.ilike.%${searchTerm}%`
+        }
+        return `document_number.ilike.%${searchTerm}%,document_number.ilike.%${traditionalTerm}%`
+      default: // global
+        if (searchTerm === traditionalTerm) {
+          return `title.ilike.%${searchTerm}%,document_number.ilike.%${searchTerm}%,period.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%,comment.ilike.%${searchTerm}%`
+        }
+        return `title.ilike.%${searchTerm}%,title.ilike.%${traditionalTerm}%,document_number.ilike.%${searchTerm}%,document_number.ilike.%${traditionalTerm}%,period.ilike.%${searchTerm}%,period.ilike.%${traditionalTerm}%,content.ilike.%${searchTerm}%,content.ilike.%${traditionalTerm}%,comment.ilike.%${searchTerm}%,comment.ilike.%${traditionalTerm}%`
+    }
   }
-  
-  // 否则，同时搜索简体和繁体
-  return `title.ilike.%${searchTerm}%,title.ilike.%${traditionalTerm}%,document_number.ilike.%${searchTerm}%,document_number.ilike.%${traditionalTerm}%,period.ilike.%${searchTerm}%,period.ilike.%${traditionalTerm}%,content.ilike.%${searchTerm}%,content.ilike.%${traditionalTerm}%,comment.ilike.%${searchTerm}%,comment.ilike.%${traditionalTerm}%`
-}
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
@@ -65,6 +86,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const searchTerm = req.query.q as string || ''
+    const searchType = req.query.type as string || 'global'
     const page = parseInt(req.query.page as string || '1')
     const limit = 20
     const offset = (page - 1) * limit
@@ -74,7 +96,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return
     }
 
-    const searchConditions = generateSearchConditions(searchTerm)
+    const searchConditions = generateSearchConditions(searchTerm, searchType)
     
     const { data: docs, error: docsError, count: docsCount } = await supabase
       .from('documents')
