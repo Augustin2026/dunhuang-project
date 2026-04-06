@@ -35,6 +35,7 @@ export default function Home() {
   const [submittingFeedback, setSubmittingFeedback] = useState(false)
   const [feedbackSuccess, setFeedbackSuccess] = useState(false)
   const [expandedDocs, setExpandedDocs] = useState<Record<string, boolean>>({})
+  const [showCopyrightModal, setShowCopyrightModal] = useState(false)
 
   function toggleDocExpansion(docId: string) {
     setExpandedDocs(prev => ({
@@ -625,10 +626,66 @@ export default function Home() {
           </div>
         )}
 
-        <footer className="mt-24 pt-10 border-t border-paper-200 text-center">
-          <p className="text-ink-700/40 text-sm">
-            敦煌吐鲁番文献检索与上传系统 © {new Date().getFullYear()}
-          </p>
+        {showCopyrightModal && (
+          <div className="fixed inset-0 bg-ink-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-paper-lg">
+              <div className="flex justify-between items-start mb-6">
+                <h3 className="text-xl font-serif font-semibold text-ink-900">版权与免责声明</h3>
+                <button
+                  onClick={() => setShowCopyrightModal(false)}
+                  className="text-ink-700/60 hover:text-ink-900 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="space-y-4 text-ink-700/80 text-sm leading-relaxed">
+                <p>本网站致力于敦煌吐鲁番文献的学术交流与共享，所有文献资料均来源于公开渠道，仅供学术研究使用。</p>
+                <p>版权声明：</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>本网站的所有内容，包括但不限于文字、图片、图表等，均受版权保护。</li>
+                  <li>未经授权，任何单位或个人不得将本网站的内容用于商业用途。</li>
+                  <li>如需引用本网站的内容，请注明出处。</li>
+                </ul>
+                <p>免责声明：</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>本网站所提供的信息仅供参考，不构成任何学术或法律建议。</li>
+                  <li>本网站不对因使用本网站内容而导致的任何损失或损害承担责任。</li>
+                  <li>本网站保留随时修改或更新网站内容的权利。</li>
+                </ul>
+                <p>如有任何问题，请联系网站管理员。</p>
+              </div>
+              
+              <div className="mt-8 text-center">
+                <button
+                  onClick={() => setShowCopyrightModal(false)}
+                  className="btn-primary px-8"
+                >
+                  关闭
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <footer className="mt-24 pt-10 pb-10 border-t border-paper-200 bg-paper-50">
+          <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
+            <div className="flex flex-col md:flex-row justify-center items-center gap-4 text-center md:text-left">
+              <p className="text-ink-700/40 text-sm">
+                © {new Date().getFullYear()} 敦煌吐鲁番文献检索与上传系统. 致力于敦煌吐鲁番文献的学术交流与共享。
+              </p>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setShowCopyrightModal(true)}
+                  className="text-sm text-accent-bronze hover:text-accent-gold transition-colors font-medium"
+                >
+                  版权与免责声明
+                </button>
+              </div>
+            </div>
+          </div>
         </footer>
       </main>
     </div>
