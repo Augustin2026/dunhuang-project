@@ -213,10 +213,7 @@ export default function Home() {
       <main className="max-w-6xl mx-auto py-20 px-6 sm:px-8 lg:px-12">
         <div className="fixed top-0 left-0 right-0 z-40 backdrop-blur-md bg-white/70 border-b border-paper-200/50 shadow-sm">
           <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-4">
-            <div className="flex justify-between items-center">
-              <a href="/" className="text-ink-900 font-serif font-semibold text-lg">
-                敦煌文献检索
-              </a>
+            <div className="flex justify-end items-center">
               <a
                 href="/admin"
                 className="px-5 py-2 bg-ink-800/90 text-white rounded-xl font-medium text-sm hover:bg-ink-900 transition-all duration-300 shadow-sm hover:shadow-md"
