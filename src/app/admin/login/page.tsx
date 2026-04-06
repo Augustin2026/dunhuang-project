@@ -33,17 +33,28 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-paper-50 flex items-center justify-center px-6">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-10">
-          <div className="decorative-line mx-auto mb-8"></div>
-          <h2 className="text-3xl font-serif font-semibold text-ink-900">
-            管理员登录
-          </h2>
-          <p className="mt-3 text-ink-700/60">
-            请输入管理员密码
-          </p>
+    <div className="min-h-screen bg-paper-50">
+      <div className="fixed top-0 left-0 right-0 z-40 backdrop-blur-md bg-white/70 border-b border-paper-200/50 shadow-sm">
+        <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 py-4">
+          <div className="flex justify-between items-center">
+            <a href="/" className="text-ink-900 font-serif font-semibold text-lg">
+              敦煌文献检索
+            </a>
+          </div>
         </div>
+      </div>
+      
+      <div className="flex items-center justify-center px-6 min-h-screen pt-24">
+        <div className="max-w-md w-full">
+          <div className="text-center mb-10">
+            <div className="decorative-line mx-auto mb-8"></div>
+            <h2 className="text-3xl font-serif font-semibold text-ink-900">
+              管理员登录
+            </h2>
+            <p className="mt-3 text-ink-700/60">
+              请输入管理员密码
+            </p>
+          </div>
 
         <form onSubmit={handleSubmit} className="paper-card p-8">
           {error && (
