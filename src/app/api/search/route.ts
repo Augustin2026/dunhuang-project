@@ -48,16 +48,14 @@ export async function GET(request: NextRequest) {
       console.log('开始搜索词典...')
       let dictionaryResults = []
       try {
-        // 修复 or 条件的语法，使用正确的 Supabase 语法
         const { data: dict, error: dictError } = await supabase
           .from('dictionary')
           .select('*')
           .or(`word.ilike.%${searchTerm}%,definition.ilike.%${searchTerm}%`)
-          .range(0, 19) // 词典也限制最多20条
+          .range(0, 19)
 
         if (dictError) {
           console.error('搜索词典失败:', dictError)
-          // 只记录错误，不影响文献搜索结果
           dictionaryResults = []
         } else {
           dictionaryResults = dict || []
@@ -65,7 +63,6 @@ export async function GET(request: NextRequest) {
         }
       } catch (error) {
         console.error('搜索词典失败:', error)
-        // 只记录错误，不影响文献搜索结果
         dictionaryResults = []
       }
 
