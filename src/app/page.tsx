@@ -241,45 +241,50 @@ export default function Home() {
                 </div>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 gap-10">
+              <div className="grid md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-lg font-serif font-medium text-ink-800 mb-6 flex items-center gap-3">
                     <span className="w-1.5 h-1.5 bg-accent-gold rounded-full"></span>
                     文献结果
                   </h3>
                   {documentResults.length === 0 ? (
-                    <div className="paper-card p-10 text-center">
+                    <div className="bg-white rounded-xl p-8 text-center shadow-sm border border-paper-100">
                       <p className="text-ink-700/60">未找到相关文献</p>
                     </div>
                   ) : (
-                    <div className="space-y-5">
+                    <div className="space-y-6">
                       {documentResults.map((doc) => (
-                        <div key={doc.id} className="paper-card-hover p-6">
-                          <h4 className="document-title text-lg mb-4">{doc.title}</h4>
-                          <div className="space-y-2 text-sm text-ink-700/80">
-                            <p className="flex items-start gap-2">
-                              <span className="text-ink-700/50 min-w-[5rem]">文书编号</span>
-                              <span className="font-serif">{doc.document_number}</span>
-                            </p>
-                            <p className="flex items-start gap-2">
-                              <span className="text-ink-700/50 min-w-[5rem]">所属年代</span>
-                              <span className="font-serif">{doc.period}</span>
-                            </p>
-                            <div className="mt-3 pt-3 border-t border-paper-200">
-                              <div className="document-content text-sm" dangerouslySetInnerHTML={{ __html: doc.content.substring(0, 250) + '...' }}></div>
+                        <div key={doc.id} className="bg-white rounded-xl p-6 shadow-sm border border-paper-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
+                            <h4 className="document-title text-lg font-bold flex-1">{doc.title}</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {doc.period && (
+                                <span className="px-3 py-1 bg-paper-100 text-ink-700 text-xs rounded-full">
+                                  {doc.period}
+                                </span>
+                              )}
+                              {doc.document_number && (
+                                <span className="px-3 py-1 bg-paper-100 text-ink-700 text-xs rounded-full">
+                                  {doc.document_number}
+                                </span>
+                              )}
                             </div>
-                            <p className="flex items-start gap-2 mt-3">
-                              <span className="text-ink-700/50 min-w-[5rem]">所在页码</span>
-                              <span>{doc.page_number}</span>
-                            </p>
-                            {doc.comment && (
-                              <p className="mt-3 pt-3 border-t border-paper-200 whitespace-pre-line text-ink-700/70">
-                                <span className="text-ink-700/50">注释：</span>{doc.comment}
-                              </p>
-                            )}
-
                           </div>
-                          <div className="mt-5 pt-4 border-t border-paper-200 flex justify-between items-center">
+                          
+                          <div className="mt-4">
+                            <div className="document-content text-sm text-ink-700/70 line-clamp-3" dangerouslySetInnerHTML={{ __html: doc.content }}></div>
+                          </div>
+                          
+                          <div className="mt-4 pt-4 border-t border-paper-100">
+                            <div className="flex flex-wrap gap-4 text-sm text-ink-700/60">
+                              <span>页码: {doc.page_number}</span>
+                              {doc.comment && (
+                                <span className="line-clamp-1">注释: {doc.comment}</span>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="mt-4 pt-4 border-t border-paper-100 flex justify-between items-center">
                             <p className="text-xs text-ink-700/40">
                               {new Date(doc.created_at).toLocaleDateString('zh-CN')}
                             </p>
@@ -302,16 +307,16 @@ export default function Home() {
                     词典结果
                   </h3>
                   {dictionaryResults.length === 0 ? (
-                    <div className="paper-card p-10 text-center">
+                    <div className="bg-white rounded-xl p-8 text-center shadow-sm border border-paper-100">
                       <p className="text-ink-700/60">未找到相关词典条目</p>
                     </div>
                   ) : (
-                    <div className="space-y-5">
+                    <div className="space-y-6">
                       {dictionaryResults.map((item) => (
-                        <div key={item.id} className="paper-card-hover p-6">
-                          <h4 className="document-title text-lg mb-3">{item.word}</h4>
-                          <p className="text-ink-700/80 text-sm leading-relaxed">{item.definition}</p>
-                          <p className="mt-4 pt-4 border-t border-paper-200 text-xs text-ink-700/40">
+                        <div key={item.id} className="bg-white rounded-xl p-6 shadow-sm border border-paper-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                          <h4 className="document-title text-lg font-bold mb-4">{item.word}</h4>
+                          <p className="text-ink-700/70 text-sm leading-relaxed line-clamp-4">{item.definition}</p>
+                          <p className="mt-4 pt-4 border-t border-paper-100 text-xs text-ink-700/40">
                             {new Date(item.created_at).toLocaleDateString('zh-CN')}
                           </p>
                         </div>
