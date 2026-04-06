@@ -46,6 +46,13 @@ export default function Home() {
   const [uploading, setUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
   const [agreedToTerms, setAgreedToTerms] = useState(false)
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({
+    title: '',
+    documentNumber: '',
+    period: '',
+    content: '',
+    pageNumber: ''
+  })
   const [showFeedbackForm, setShowFeedbackForm] = useState(false)
   const [currentDocumentId, setCurrentDocumentId] = useState('')
   const [currentDocumentTitle, setCurrentDocumentTitle] = useState('')
@@ -117,8 +124,41 @@ export default function Home() {
   async function handleUpload(e: React.FormEvent) {
     e.preventDefault()
     
-    if (!title.trim() || !documentNumber.trim() || !period.trim() || !content.trim() || !pageNumber.trim()) {
-      alert('请填写完整的文献信息')
+    // 验证表单
+    const errors: Record<string, string> = {
+      title: '',
+      documentNumber: '',
+      period: '',
+      content: '',
+      pageNumber: ''
+    }
+
+    if (!title.trim()) {
+      errors.title = '此项不能为空'
+    }
+    if (!documentNumber.trim()) {
+      errors.documentNumber = '此项不能为空'
+    }
+    if (!period.trim()) {
+      errors.period = '此项不能为空'
+    }
+    if (!content.trim()) {
+      errors.content = '此项不能为空'
+    }
+    if (!pageNumber.trim()) {
+      errors.pageNumber = '此项不能为空'
+    }
+
+    // 检查是否有错误
+    const hasErrors = Object.values(errors).some(error => error !== '')
+    if (hasErrors) {
+      setFormErrors(errors)
+      return
+    }
+
+    // 检查是否同意条款
+    if (!agreedToTerms) {
+      alert('请同意免责声明')
       return
     }
 
@@ -465,12 +505,20 @@ export default function Home() {
                   <input
                     type="text"
                     id="title"
-                    className="input-field"
+                    className={`input-field ${formErrors.title ? 'border-red-300 focus:ring-red-200 focus:border-red-400' : ''}`}
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={(e) => {
+                      setTitle(e.target.value)
+                      if (formErrors.title) {
+                        setFormErrors(prev => ({ ...prev, title: '' }))
+                      }
+                    }}
                     placeholder="请输入文书标题"
                     required
                   />
+                  {formErrors.title && (
+                    <p className="mt-2 text-sm text-red-600">{formErrors.title}</p>
+                  )}
                 </div>
                 
                 <div>
@@ -480,12 +528,20 @@ export default function Home() {
                   <input
                     type="text"
                     id="documentNumber"
-                    className="input-field"
+                    className={`input-field ${formErrors.documentNumber ? 'border-red-300 focus:ring-red-200 focus:border-red-400' : ''}`}
                     value={documentNumber}
-                    onChange={(e) => setDocumentNumber(e.target.value)}
+                    onChange={(e) => {
+                      setDocumentNumber(e.target.value)
+                      if (formErrors.documentNumber) {
+                        setFormErrors(prev => ({ ...prev, documentNumber: '' }))
+                      }
+                    }}
                     placeholder="请输入文书编号"
                     required
                   />
+                  {formErrors.documentNumber && (
+                    <p className="mt-2 text-sm text-red-600">{formErrors.documentNumber}</p>
+                  )}
                 </div>
                 
                 <div>
@@ -495,23 +551,36 @@ export default function Home() {
                   <input
                     type="text"
                     id="period"
-                    className="input-field"
+                    className={`input-field ${formErrors.period ? 'border-red-300 focus:ring-red-200 focus:border-red-400' : ''}`}
                     value={period}
-                    onChange={(e) => setPeriod(e.target.value)}
+                    onChange={(e) => {
+                      setPeriod(e.target.value)
+                      if (formErrors.period) {
+                        setFormErrors(prev => ({ ...prev, period: '' }))
+                      }
+                    }}
                     placeholder="请输入所属年代"
                     required
                   />
+                  {formErrors.period && (
+                    <p className="mt-2 text-sm text-red-600">{formErrors.period}</p>
+                  )}
                 </div>
                 
                 <div>
                   <label htmlFor="content" className="block text-sm font-medium text-ink-800 mb-3">
                     文书释文 <span className="text-accent-gold">*</span>
                   </label>
-                  <div className="bg-white border border-paper-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-accent-bronze/20 focus-within:border-accent-bronze/40 transition-all duration-200">
+                  <div className={`bg-white border ${formErrors.content ? 'border-red-300' : 'border-paper-200'} rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-accent-bronze/20 focus-within:border-accent-bronze/40 transition-all duration-200`}>
                     <ReactQuill
                       id="content"
                       value={content}
-                      onChange={(value) => setContent(value)}
+                      onChange={(value) => {
+                        setContent(value)
+                        if (formErrors.content) {
+                          setFormErrors(prev => ({ ...prev, content: '' }))
+                        }
+                      }}
                       placeholder="请输入文书释文"
                       modules={{
                         toolbar: [
@@ -533,6 +602,9 @@ export default function Home() {
                       }}
                     />
                   </div>
+                  {formErrors.content && (
+                    <p className="mt-2 text-sm text-red-600">{formErrors.content}</p>
+                  )}
                 </div>
                 
                 <div>
@@ -555,12 +627,20 @@ export default function Home() {
                   <input
                     type="text"
                     id="pageNumber"
-                    className="input-field"
+                    className={`input-field ${formErrors.pageNumber ? 'border-red-300 focus:ring-red-200 focus:border-red-400' : ''}`}
                     value={pageNumber}
-                    onChange={(e) => setPageNumber(e.target.value)}
+                    onChange={(e) => {
+                      setPageNumber(e.target.value)
+                      if (formErrors.pageNumber) {
+                        setFormErrors(prev => ({ ...prev, pageNumber: '' }))
+                      }
+                    }}
                     placeholder="请输入所在页码"
                     required
                   />
+                  {formErrors.pageNumber && (
+                    <p className="mt-2 text-sm text-red-600">{formErrors.pageNumber}</p>
+                  )}
                 </div>
                 
                 <div className="flex items-start gap-3">
@@ -581,7 +661,7 @@ export default function Home() {
                   <button
                     type="submit"
                     className="w-full btn-primary"
-                    disabled={uploading || !agreedToTerms}
+                    disabled={uploading || !agreedToTerms || !title.trim() || !documentNumber.trim() || !period.trim() || !content.trim() || !pageNumber.trim()}
                   >
                     {uploading ? '上传中...' : '提交上传'}
                   </button>
