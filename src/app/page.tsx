@@ -76,6 +76,25 @@ export default function Home() {
     }
   }
 
+  function highlightText(text: string, keyword: string): React.ReactNode {
+    if (!keyword.trim()) return text
+    
+    const parts = text.split(new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'))
+    
+    return parts.map((part, index) => 
+      part.toLowerCase() === keyword.toLowerCase() 
+        ? <span key={index} className="bg-yellow-200/50 font-semibold">{part}</span>
+        : part
+    )
+  }
+
+  function highlightHTML(html: string, keyword: string): string {
+    if (!keyword.trim()) return html
+    
+    const regex = new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
+    return html.replace(regex, '<span class="bg-yellow-200/50 font-semibold">$1</span>')
+  }
+
   async function handleUpload(e: React.FormEvent) {
     e.preventDefault()
     
@@ -265,30 +284,30 @@ export default function Home() {
                       {documentResults.map((doc) => (
                         <div key={doc.id} className="bg-white rounded-xl p-6 shadow-sm border border-paper-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
-                            <h4 className="document-title text-lg font-bold flex-1">{doc.title}</h4>
+                            <h4 className="document-title text-lg font-bold flex-1">{highlightText(doc.title, searchTerm)}</h4>
                             <div className="flex flex-wrap gap-2">
                               {doc.period && (
                                 <span className="px-3 py-1 bg-paper-100 text-ink-700 text-xs rounded-full">
-                                  {doc.period}
+                                  {highlightText(doc.period, searchTerm)}
                                 </span>
                               )}
                               {doc.document_number && (
                                 <span className="px-3 py-1 bg-paper-100 text-ink-700 text-xs rounded-full">
-                                  {doc.document_number}
+                                  {highlightText(doc.document_number, searchTerm)}
                                 </span>
                               )}
                             </div>
                           </div>
                           
                           <div className="mt-4">
-                            <div className="document-content text-sm text-ink-700/70 line-clamp-3" dangerouslySetInnerHTML={{ __html: doc.content }}></div>
+                            <div className="document-content text-sm text-ink-700/70 line-clamp-3" dangerouslySetInnerHTML={{ __html: highlightHTML(doc.content, searchTerm) }}></div>
                           </div>
                           
                           <div className="mt-4 pt-4 border-t border-paper-100">
                             <div className="flex flex-wrap gap-4 text-sm text-ink-700/60">
-                              <span>页码: {doc.page_number}</span>
+                              <span>页码: {highlightText(doc.page_number, searchTerm)}</span>
                               {doc.comment && (
-                                <span className="line-clamp-1">注释: {doc.comment}</span>
+                                <span className="line-clamp-1">注释: {highlightText(doc.comment, searchTerm)}</span>
                               )}
                             </div>
                           </div>
@@ -323,8 +342,8 @@ export default function Home() {
                     <div className="space-y-6">
                       {dictionaryResults.map((item) => (
                         <div key={item.id} className="bg-white rounded-xl p-6 shadow-sm border border-paper-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                          <h4 className="document-title text-lg font-bold mb-4">{item.word}</h4>
-                          <p className="text-ink-700/70 text-sm leading-relaxed line-clamp-4">{item.definition}</p>
+                          <h4 className="document-title text-lg font-bold mb-4">{highlightText(item.word, searchTerm)}</h4>
+                          <p className="text-ink-700/70 text-sm leading-relaxed line-clamp-4">{highlightText(item.definition, searchTerm)}</p>
                           <p className="mt-4 pt-4 border-t border-paper-100 text-xs text-ink-700/40">
                             {new Date(item.created_at).toLocaleDateString('zh-CN')}
                           </p>
