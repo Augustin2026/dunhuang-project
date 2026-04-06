@@ -4,10 +4,10 @@ import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 const notoSansSC = Noto_Serif_SC({
-  subsets: ['latin'],
+  subsets: ['latin', 'chinese-simplified'],
   weight: ['400', '500', '600', '700'],
   display: 'swap',
-  fallback: ['serif', 'SimSun', 'STSong', 'NSimSun']
+  fallback: ['serif', 'SimSun', 'STSong', 'NSimSun', 'Microsoft YaHei', 'Arial Unicode MS']
 })
 
 export const metadata: Metadata = {
