@@ -297,6 +297,11 @@ const Page = () => {
           <div className="text-2xl font-bold text-ink-900">
             敦煌文献检索系统
           </div>
+          <div>
+            <a href="/admin" className="text-ink-700 hover:text-ink-900 font-medium">
+              管理员入口
+            </a>
+          </div>
         </div>
       </nav>
 
@@ -388,7 +393,7 @@ const Page = () => {
                         {doc.comment && (
                           <div className="mb-4">
                             <h5 className="text-sm font-semibold text-ink-700 mb-1">文献注释:</h5>
-                            <p className="text-gray-600 text-sm">{doc.comment}</p>
+                            <p className="text-gray-600 text-sm">{highlightText(doc.comment, searchTerm)}</p>
                           </div>
                         )}
                         {doc.page_number && (
@@ -502,6 +507,16 @@ const Page = () => {
           </div>
           <div className="mb-6">
             <label className="block text-sm font-medium text-ink-700 mb-1">
+              释文 *
+            </label>
+            <ReactQuill
+              value={content}
+              onChange={setContent}
+              className="border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            />
+          </div>
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-ink-700 mb-1">
               文献注释
             </label>
             <input
@@ -509,16 +524,6 @@ const Page = () => {
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-            />
-          </div>
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-ink-700 mb-1">
-              释文 *
-            </label>
-            <ReactQuill
-              value={content}
-              onChange={setContent}
-              className="border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
           <div className="mb-6">
