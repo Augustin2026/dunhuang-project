@@ -110,7 +110,8 @@ export default function AdminPage() {
         period: editedDocument.period,
         content: editedDocument.content,
         page_number: editedDocument.page_number,
-        comment: editedDocument.comment
+        comment: editedDocument.comment,
+        image_url: editedDocument.image_url
       })
       .eq('id', id)
 
@@ -148,6 +149,7 @@ export default function AdminPage() {
         content: editedDocument.content,
         page_number: editedDocument.page_number,
         comment: editedDocument.comment,
+        image_url: editedDocument.image_url,
         status: 'approved'
       })
       .eq('id', id)
@@ -393,6 +395,20 @@ export default function AdminPage() {
                           onChange={(e) => setEditedDocument({ ...editedDocument, comment: e.target.value })}
                         />
                       </div>
+                      
+                      <div>
+                        <label htmlFor="image_url" className="block text-sm font-medium text-gray-700 mb-1">
+                          图片URL（用于异体字或无法打出的字）
+                        </label>
+                        <input
+                          type="text"
+                          id="image_url"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          value={editedDocument?.image_url || ''}
+                          onChange={(e) => setEditedDocument({ ...editedDocument, image_url: e.target.value })}
+                          placeholder="请输入图片URL（可选）"
+                        />
+                      </div>
                     </div>
                     
                     <div className="flex space-x-2 mt-6">
@@ -427,9 +443,15 @@ export default function AdminPage() {
                       <div className="mt-2 space-y-1 text-sm text-gray-600">
                         <p>文书编号: {doc.document_number}</p>
                         <p>所属年代: {doc.period}</p>
-                        <p className="mt-2">{doc.content.substring(0, 200)}...</p>
+                        <p className="mt-2 whitespace-pre-line">{doc.content.substring(0, 200)}...</p>
                         <p>所在页码: {doc.page_number}</p>
-                        {doc.comment && <p>文献注释: {doc.comment}</p>}
+                        {doc.comment && <p className="whitespace-pre-line">文献注释: {doc.comment}</p>}
+                        {doc.image_url && (
+                          <div className="mt-2">
+                            <p>图片: </p>
+                            <img src={doc.image_url} alt="文献图片" className="max-w-full h-auto rounded" />
+                          </div>
+                        )}
                       </div>
                       <p className="mt-4 text-sm text-gray-500">
                         提交时间: {new Date(doc.created_at).toLocaleString()}

@@ -16,6 +16,7 @@ export default function Home() {
   const [content, setContent] = useState('')
   const [pageNumber, setPageNumber] = useState('')
   const [comment, setComment] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
   const [uploading, setUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
 
@@ -107,6 +108,7 @@ export default function Home() {
         content,
         page_number: pageNumber,
         comment,
+        image_url: imageUrl,
         status: 'pending' // 自动设置为待审核状态
       })
       .select()
@@ -124,6 +126,7 @@ export default function Home() {
       setContent('')
       setPageNumber('')
       setComment('')
+      setImageUrl('')
       // 3秒后重置成功状态
       setTimeout(() => {
         setUploadSuccess(false)
@@ -204,9 +207,15 @@ export default function Home() {
                           <div className="mt-2 space-y-1 text-sm text-gray-600">
                             <p>文书编号: {doc.document_number}</p>
                             <p>所属年代: {doc.period}</p>
-                            <p className="mt-2">{doc.content.substring(0, 150)}...</p>
+                            <p className="mt-2 whitespace-pre-line">{doc.content.substring(0, 150)}...</p>
                             <p>所在页码: {doc.page_number}</p>
-                            {doc.comment && <p>文献注释: {doc.comment}</p>}
+                            {doc.comment && <p className="whitespace-pre-line">文献注释: {doc.comment}</p>}
+                            {doc.image_url && (
+                              <div className="mt-2">
+                                <p>图片: </p>
+                                <img src={doc.image_url} alt="文献图片" className="max-w-full h-auto rounded" />
+                              </div>
+                            )}
                           </div>
                           <p className="mt-3 text-xs text-gray-400">
                             创建时间: {new Date(doc.created_at).toLocaleString()}
@@ -347,6 +356,20 @@ export default function Home() {
                     onChange={(e) => setComment(e.target.value)}
                     placeholder="请输入文献注释（可选）"
                   ></textarea>
+                </div>
+                
+                <div>
+                  <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-2">
+                    图片URL（用于异体字或无法打出的字）
+                  </label>
+                  <input
+                    type="text"
+                    id="imageUrl"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    placeholder="请输入图片URL（可选）"
+                  />
                 </div>
                 
                 <div>
