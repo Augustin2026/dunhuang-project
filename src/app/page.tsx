@@ -70,13 +70,13 @@ export default function Home() {
   }
 
   async function handleSearch() {
-    if (!debouncedSearchTerm.trim()) return
+    if (!searchTerm.trim()) return
 
     setLoading(true)
     setShowResults(true)
 
     try {
-      const response = await fetch(`/api/search?q=${encodeURIComponent(debouncedSearchTerm)}&page=1`)
+      const response = await fetch(`/api/search?q=${encodeURIComponent(searchTerm)}&page=1`)
       const data = await response.json()
 
       if (data.error) {
