@@ -28,6 +28,7 @@ export default function Home() {
   const [pageNumber, setPageNumber] = useState('')
   const [uploading, setUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [showFeedbackForm, setShowFeedbackForm] = useState(false)
   const [currentDocumentId, setCurrentDocumentId] = useState('')
   const [currentDocumentTitle, setCurrentDocumentTitle] = useState('')
@@ -557,11 +558,25 @@ export default function Home() {
                   />
                 </div>
                 
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    className="mt-1 h-4 w-4 rounded border-paper-200 text-accent-bronze focus:ring-accent-bronze/20"
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                    required
+                  />
+                  <label htmlFor="terms" className="text-sm text-ink-700/80 leading-relaxed">
+                    我承诺上传的内容仅供学术交流，不侵犯他人知识产权。
+                  </label>
+                </div>
+                
                 <div className="pt-4">
                   <button
                     type="submit"
                     className="w-full btn-primary"
-                    disabled={uploading}
+                    disabled={uploading || !agreedToTerms}
                   >
                     {uploading ? '上传中...' : '提交上传'}
                   </button>
