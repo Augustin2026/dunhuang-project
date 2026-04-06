@@ -1,8 +1,8 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/admin/login/page": "app/admin/login/page.js",
-  "/admin/page": "app/admin/page.js",
   "/page": "app/page.js",
+  "/admin/login/page": "app/admin/login/page.js",
+  "/api/search/route": "app/api/search/route.js",
   "/upload/page": "app/upload/page.js",
-  "/api/search/route": "app/api/search/route.js"
+  "/admin/page": "app/admin/page.js"
 }

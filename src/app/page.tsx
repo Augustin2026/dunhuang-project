@@ -16,10 +16,27 @@ if (typeof window !== 'undefined') {
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [loading, setLoading] = useState(false)
   const [documentResults, setDocumentResults] = useState<any[]>([])
   const [dictionaryResults, setDictionaryResults] = useState<any[]>([])
   const [showResults, setShowResults] = useState(false)
+
+  // 防抖处理
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  // 当防抖搜索词变化时触发搜索
+  useEffect(() => {
+    if (debouncedSearchTerm.trim()) {
+      handleSearch()
+    }
+  }, [debouncedSearchTerm])
   const [title, setTitle] = useState('')
   const [documentNumber, setDocumentNumber] = useState('')
   const [period, setPeriod] = useState('')
@@ -46,13 +63,13 @@ export default function Home() {
   }
 
   async function handleSearch() {
-    if (!searchTerm.trim()) return
+    if (!debouncedSearchTerm.trim()) return
 
     setLoading(true)
     setShowResults(true)
 
     try {
-      const response = await fetch(`/api/search?q=${encodeURIComponent(searchTerm)}&page=1`)
+      const response = await fetch(`/api/search?q=${encodeURIComponent(debouncedSearchTerm)}&page=1`)
       const data = await response.json()
 
       if (data.error) {
