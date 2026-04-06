@@ -293,15 +293,10 @@ const Page = () => {
     <div className="min-h-screen bg-stone-50 text-ink-800 font-serif">
       {/* 毛玻璃导航栏 */}
       <nav className="backdrop-blur-md bg-white/70 sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="text-2xl font-bold text-ink-900">
-            吐鲁番出土文献检索系统
-          </div>
-          <div>
-            <a href="/admin" className="text-ink-700 hover:text-ink-900 font-medium">
-              管理员入口
-            </a>
-          </div>
+        <div className="container mx-auto px-4 py-4 flex justify-end items-center">
+          <a href="/admin" className="text-ink-700 hover:text-ink-900 font-medium">
+            管理员入口
+          </a>
         </div>
       </nav>
 
