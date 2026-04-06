@@ -3,6 +3,18 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
+
+// 动态导入 ReactQuill，确保只在客户端加载
+const ReactQuill = dynamic(
+  () => import('react-quill'),
+  { ssr: false }
+)
+
+// 动态导入样式
+if (typeof window !== 'undefined') {
+  require('quill/dist/quill.snow.css')
+}
 
 export default function AdminPage() {
   const [pendingDocuments, setPendingDocuments] = useState<any[]>([])
@@ -359,14 +371,32 @@ export default function AdminPage() {
                         <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
                           文书释文
                         </label>
-                        <textarea
-                          id="content"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          rows={6}
-                          value={editedDocument?.content || ''}
-                          onChange={(e) => setEditedDocument({ ...editedDocument, content: e.target.value })}
-                          required
-                        />
+                        <div className="w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          <ReactQuill
+                            id="content"
+                            value={editedDocument?.content || ''}
+                            onChange={(value) => setEditedDocument({ ...editedDocument, content: value })}
+                            placeholder="请输入文书释文"
+                            modules={{
+                              toolbar: [
+                                ['bold', 'italic', 'underline', 'strike'],
+                                ['blockquote', 'code-block'],
+                                [{ 'header': 1 }, { 'header': 2 }],
+                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                [{ 'script': 'sub' }, { 'script': 'super' }],
+                                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                                [{ 'direction': 'rtl' }],
+                                [{ 'size': ['small', false, 'large', 'huge'] }],
+                                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                                [{ 'color': [] }, { 'background': [] }],
+                                [{ 'font': [] }],
+                                [{ 'align': [] }],
+                                ['clean'],
+                                ['image']
+                              ]
+                            }}
+                          />
+                        </div>
                       </div>
                       
                       <div>
@@ -443,7 +473,7 @@ export default function AdminPage() {
                       <div className="mt-2 space-y-1 text-sm text-gray-600">
                         <p>文书编号: {doc.document_number}</p>
                         <p>所属年代: {doc.period}</p>
-                        <p className="mt-2 whitespace-pre-line">{doc.content.substring(0, 200)}...</p>
+                        <div className="mt-2" dangerouslySetInnerHTML={{ __html: doc.content.substring(0, 400) + '...' }}></div>
                         <p>所在页码: {doc.page_number}</p>
                         {doc.comment && <p className="whitespace-pre-line">文献注释: {doc.comment}</p>}
                         {doc.image_url && (
