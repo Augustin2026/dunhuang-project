@@ -80,21 +80,28 @@ export default function AdminPage() {
   }, [showFeedbacks])
 
   async function handleApprove(id: string) {
+    console.log('开始审核通过文献，ID:', id)
     setActionLoading(id)
 
-    const { error } = await supabase
-      .from('documents')
-      .update({ status: 'approved' })
-      .eq('id', id)
+    try {
+      const { error } = await supabase
+        .from('documents')
+        .update({ status: 'approved' })
+        .eq('id', id)
 
-    if (error) {
-      console.error('审核通过失败:', error)
+      if (error) {
+        console.error('审核通过失败:', error)
+        alert('审核通过失败，请重试')
+      } else {
+        console.log('审核通过成功，ID:', id)
+        setPendingDocuments(pendingDocuments.filter(doc => doc.id !== id))
+      }
+    } catch (error) {
+      console.error('审核通过过程中发生错误:', error)
       alert('审核通过失败，请重试')
-    } else {
-      setPendingDocuments(pendingDocuments.filter(doc => doc.id !== id))
+    } finally {
+      setActionLoading(null)
     }
-
-    setActionLoading(null)
   }
 
   async function handleReject(id: string) {
