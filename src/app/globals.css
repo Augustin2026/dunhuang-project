@@ -45,7 +45,7 @@ body {
   }
   
   .document-content {
-    @apply font-serif text-ink-800 leading-relaxed;
+    @apply font-serif text-ink-800 leading-relaxed break-words;
   }
   
   .btn-primary {
