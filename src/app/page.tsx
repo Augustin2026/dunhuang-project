@@ -15,6 +15,7 @@ export default function Home() {
   const [period, setPeriod] = useState('')
   const [content, setContent] = useState('')
   const [pageNumber, setPageNumber] = useState('')
+  const [comment, setComment] = useState('')
   const [uploading, setUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
 
@@ -31,7 +32,7 @@ export default function Home() {
       .select('*')
       .eq('status', 'approved')
       .ilike('title', `%${searchTerm}%`)
-      .or(`ilike(document_number, %${searchTerm}%),ilike(period, %${searchTerm}%),ilike(content, %${searchTerm}%),ilike(page_number, %${searchTerm}%)`)
+      .or(`ilike(document_number, %${searchTerm}%),ilike(period, %${searchTerm}%),ilike(content, %${searchTerm}%),ilike(page_number, %${searchTerm}%),ilike(comment, %${searchTerm}%)`)
 
     if (docsError) {
       console.error('搜索文献失败:', docsError)
@@ -105,6 +106,7 @@ export default function Home() {
         period,
         content,
         page_number: pageNumber,
+        comment,
         status: 'pending' // 自动设置为待审核状态
       })
       .select()
@@ -121,6 +123,7 @@ export default function Home() {
       setPeriod('')
       setContent('')
       setPageNumber('')
+      setComment('')
       // 3秒后重置成功状态
       setTimeout(() => {
         setUploadSuccess(false)
@@ -203,6 +206,7 @@ export default function Home() {
                             <p>所属年代: {doc.period}</p>
                             <p className="mt-2">{doc.content.substring(0, 150)}...</p>
                             <p>所在页码: {doc.page_number}</p>
+                            {doc.comment && <p>文献注释: {doc.comment}</p>}
                           </div>
                           <p className="mt-3 text-xs text-gray-400">
                             创建时间: {new Date(doc.created_at).toLocaleString()}
@@ -329,6 +333,20 @@ export default function Home() {
                     placeholder="请输入所在页码"
                     required
                   />
+                </div>
+                
+                <div>
+                  <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-2">
+                    文献注释
+                  </label>
+                  <textarea
+                    id="comment"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    rows={4}
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="请输入文献注释（可选）"
+                  ></textarea>
                 </div>
                 
                 <div>

@@ -109,7 +109,8 @@ export default function AdminPage() {
         document_number: editedDocument.document_number,
         period: editedDocument.period,
         content: editedDocument.content,
-        page_number: editedDocument.page_number
+        page_number: editedDocument.page_number,
+        comment: editedDocument.comment
       })
       .eq('id', id)
 
@@ -146,6 +147,7 @@ export default function AdminPage() {
         period: editedDocument.period,
         content: editedDocument.content,
         page_number: editedDocument.page_number,
+        comment: editedDocument.comment,
         status: 'approved'
       })
       .eq('id', id)
@@ -378,6 +380,19 @@ export default function AdminPage() {
                           required
                         />
                       </div>
+                      
+                      <div>
+                        <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">
+                          文献注释
+                        </label>
+                        <textarea
+                          id="comment"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          rows={4}
+                          value={editedDocument?.comment || ''}
+                          onChange={(e) => setEditedDocument({ ...editedDocument, comment: e.target.value })}
+                        />
+                      </div>
                     </div>
                     
                     <div className="flex space-x-2 mt-6">
@@ -414,6 +429,7 @@ export default function AdminPage() {
                         <p>所属年代: {doc.period}</p>
                         <p className="mt-2">{doc.content.substring(0, 200)}...</p>
                         <p>所在页码: {doc.page_number}</p>
+                        {doc.comment && <p>文献注释: {doc.comment}</p>}
                       </div>
                       <p className="mt-4 text-sm text-gray-500">
                         提交时间: {new Date(doc.created_at).toLocaleString()}
