@@ -34,6 +34,14 @@ export default function Home() {
   const [feedbackContent, setFeedbackContent] = useState('')
   const [submittingFeedback, setSubmittingFeedback] = useState(false)
   const [feedbackSuccess, setFeedbackSuccess] = useState(false)
+  const [expandedDocs, setExpandedDocs] = useState<Record<string, boolean>>({})
+
+  function toggleDocExpansion(docId: string) {
+    setExpandedDocs(prev => ({
+      ...prev,
+      [docId]: !prev[docId]
+    }))
+  }
 
   async function handleSearch() {
     if (!searchTerm.trim()) return
@@ -357,7 +365,16 @@ export default function Home() {
                           </div>
                           
                           <div className="mt-4">
-                            <div className="document-content text-sm text-ink-700/70 line-clamp-3" dangerouslySetInnerHTML={{ __html: highlightHTML(doc.content, searchTerm) }}></div>
+                            <div className={`document-content text-sm text-ink-700/70 leading-relaxed ${expandedDocs[doc.id] ? '' : 'line-clamp-3'}`} dangerouslySetInnerHTML={{ __html: highlightHTML(doc.content, searchTerm) }}></div>
+                          </div>
+                          
+                          <div className="mt-4 flex justify-between items-center">
+                            <button
+                              onClick={() => toggleDocExpansion(doc.id)}
+                              className="text-sm text-accent-bronze hover:text-accent-gold transition-colors font-medium"
+                            >
+                              {expandedDocs[doc.id] ? '收起' : '展开'}
+                            </button>
                           </div>
                           
                           <div className="mt-4 pt-4 border-t border-paper-100">
