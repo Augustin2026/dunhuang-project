@@ -210,6 +210,9 @@ const Page = () => {
   const [selectedDoc, setSelectedDoc] = useState<any>(null)
   const [feedbackText, setFeedbackText] = useState('')
   const [showFeedbackModal, setShowFeedbackModal] = useState(false)
+  
+  // 版权与免责声明模态框状态管理
+  const [showCopyrightModal, setShowCopyrightModal] = useState(false)
 
   // 处理反馈提交
   const handleFeedbackSubmit = async (e: React.FormEvent) => {
@@ -596,11 +599,46 @@ const Page = () => {
           <p className="text-ink-700 mb-4">
             © 2026 吐鲁番出土文献检索系统. 致力于吐鲁番出土文献的学术交流与共享。
           </p>
-          <button className="text-amber-700 hover:text-amber-900 font-medium">
+          <button onClick={() => setShowCopyrightModal(true)} className="text-amber-700 hover:text-amber-900 font-medium">
             版权与免责声明
           </button>
         </div>
       </footer>
+
+      {/* 版权与免责声明模态框 */}
+      {showCopyrightModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <h3 className="text-xl font-bold text-ink-900">版权与免责声明</h3>
+              <button
+                onClick={() => setShowCopyrightModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              <p className="text-ink-700 mb-4 leading-relaxed">
+                本站部分文献数据与释文由网络搜集或注册用户自发上传。本站仅提供信息存储空间服务，不对用户上传内容的版权归属及真实性作实质性审查。
+              </p>
+              <p className="text-ink-700 mb-4 leading-relaxed">
+                若本站收录的文献、词条或图片侵犯了您的合法权益，请联系管理员（邮箱：[你的邮箱]）。我们将在核实后第一时间进行删除或断开链接处理，感谢您的理解与监督。
+              </p>
+            </div>
+            <div className="p-6 border-t border-gray-200 flex justify-end">
+              <button
+                onClick={() => setShowCopyrightModal(false)}
+                className="px-4 py-2 bg-ink-800 text-white rounded-lg hover:bg-ink-900 transition-all duration-300"
+              >
+                关闭
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
