@@ -31,45 +31,8 @@ export default function Home() {
     return () => clearTimeout(timer)
   }, [searchTerm])
 
-  // 当防抖搜索词变化时触发搜索
-  useEffect(() => {
-    if (debouncedSearchTerm.trim()) {
-      handleSearch(debouncedSearchTerm)
-    }
-  }, [debouncedSearchTerm])
-  const [title, setTitle] = useState('')
-  const [documentNumber, setDocumentNumber] = useState('')
-  const [period, setPeriod] = useState('')
-  const [content, setContent] = useState('')
-  const [comment, setComment] = useState('')
-  const [pageNumber, setPageNumber] = useState('')
-  const [uploading, setUploading] = useState(false)
-  const [uploadSuccess, setUploadSuccess] = useState(false)
-  const [agreedToTerms, setAgreedToTerms] = useState(false)
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({
-    title: '',
-    documentNumber: '',
-    period: '',
-    content: '',
-    pageNumber: ''
-  })
-  const [showFeedbackForm, setShowFeedbackForm] = useState(false)
-  const [currentDocumentId, setCurrentDocumentId] = useState('')
-  const [currentDocumentTitle, setCurrentDocumentTitle] = useState('')
-  const [feedbackContent, setFeedbackContent] = useState('')
-  const [submittingFeedback, setSubmittingFeedback] = useState(false)
-  const [feedbackSuccess, setFeedbackSuccess] = useState(false)
-  const [expandedDocs, setExpandedDocs] = useState<Record<string, boolean>>({})
-  const [showCopyrightModal, setShowCopyrightModal] = useState(false)
-
-  function toggleDocExpansion(docId: string) {
-    setExpandedDocs(prev => ({
-      ...prev,
-      [docId]: !prev[docId]
-    }))
-  }
-
-  async function handleSearch(event?: React.MouseEvent | string) {
+  // 使用 useCallback 来 memoize handleSearch 函数
+  const memoizedHandleSearch = useCallback(async (event?: React.MouseEvent | string) => {
     // 检查是否是鼠标事件
     if (event && typeof event === 'object' && 'preventDefault' in event) {
       event.preventDefault()
@@ -161,11 +124,51 @@ export default function Home() {
         console.log('设置加载状态为 false')
       }
     }
+  }, [searchTerm, setLoading, setShowResults, setDocumentResults, setDictionaryResults])
+
+  // 当防抖搜索词变化时触发搜索
+  useEffect(() => {
+    if (debouncedSearchTerm.trim()) {
+      memoizedHandleSearch(debouncedSearchTerm)
+    }
+  }, [debouncedSearchTerm, memoizedHandleSearch])
+  const [title, setTitle] = useState('')
+  const [documentNumber, setDocumentNumber] = useState('')
+  const [period, setPeriod] = useState('')
+  const [content, setContent] = useState('')
+  const [comment, setComment] = useState('')
+  const [pageNumber, setPageNumber] = useState('')
+  const [uploading, setUploading] = useState(false)
+  const [uploadSuccess, setUploadSuccess] = useState(false)
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({
+    title: '',
+    documentNumber: '',
+    period: '',
+    content: '',
+    pageNumber: ''
+  })
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false)
+  const [currentDocumentId, setCurrentDocumentId] = useState('')
+  const [currentDocumentTitle, setCurrentDocumentTitle] = useState('')
+  const [feedbackContent, setFeedbackContent] = useState('')
+  const [submittingFeedback, setSubmittingFeedback] = useState(false)
+  const [feedbackSuccess, setFeedbackSuccess] = useState(false)
+  const [expandedDocs, setExpandedDocs] = useState<Record<string, boolean>>({})
+  const [showCopyrightModal, setShowCopyrightModal] = useState(false)
+
+  function toggleDocExpansion(docId: string) {
+    setExpandedDocs(prev => ({
+      ...prev,
+      [docId]: !prev[docId]
+    }))
   }
+
+
 
   function handleKeyPress(e: React.KeyboardEvent) {
     if (e.key === 'Enter') {
-      handleSearch()
+      memoizedHandleSearch()
     }
   }
 
@@ -363,7 +366,7 @@ export default function Home() {
                 onKeyPress={handleKeyPress}
               />
               <button
-                onClick={handleSearch}
+                onClick={memoizedHandleSearch}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-ink-800 text-white p-4 rounded-full hover:bg-ink-900 transition-all duration-300 shadow-md hover:shadow-lg active:scale-95"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6">
