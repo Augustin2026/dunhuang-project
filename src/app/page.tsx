@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import dynamic from 'next/dynamic'
+import { Search, BookOpen } from 'lucide-react'
 
 const ReactQuill = dynamic(
   () => import('react-quill'),
@@ -319,7 +320,19 @@ export default function Home() {
                     <span className="w-1.5 h-1.5 bg-accent-gold rounded-full"></span>
                     文献结果
                   </h3>
-                  {documentResults.length === 0 ? (
+                  {documentResults.length === 0 && dictionaryResults.length === 0 ? (
+                    <div className="col-span-2 flex flex-col items-center justify-center py-20 text-center">
+                      <div className="w-20 h-20 bg-paper-100 rounded-full flex items-center justify-center mb-6">
+                        <Search className="w-10 h-10 text-ink-700/30" />
+                      </div>
+                      <h3 className="text-xl font-serif font-medium text-ink-700/60 mb-4">
+                        抱歉，未能找到相关的文献或词条
+                      </h3>
+                      <p className="text-sm text-ink-700/40 max-w-md">
+                        您可以尝试缩短关键词，或联系管理员上传该文献
+                      </p>
+                    </div>
+                  ) : documentResults.length === 0 ? (
                     <div className="bg-white rounded-xl p-8 text-center shadow-sm border border-paper-100">
                       <p className="text-ink-700/60">未找到相关文献</p>
                     </div>
@@ -378,7 +391,7 @@ export default function Home() {
                     <span className="w-1.5 h-1.5 bg-accent-jade rounded-full"></span>
                     词典结果
                   </h3>
-                  {dictionaryResults.length === 0 ? (
+                  {dictionaryResults.length === 0 && documentResults.length > 0 ? (
                     <div className="bg-white rounded-xl p-8 text-center shadow-sm border border-paper-100">
                       <p className="text-ink-700/60">未找到相关词典条目</p>
                     </div>
