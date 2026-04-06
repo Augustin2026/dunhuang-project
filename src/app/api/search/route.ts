@@ -26,23 +26,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: '搜索文献失败' }, { status: 500 })
     }
 
-    // 搜索词典
-    const { data: dict, error: dictError } = await supabase
-      .from('dictionary')
-      .select('*')
-      .ilike('word', `%${searchTerm}%`)
-      .or(`ilike(definition, %${searchTerm}%)`)
-      .range(0, 19) // 词典也限制最多20条
-
-    if (dictError) {
-      console.error('搜索词典失败:', dictError)
-      return NextResponse.json({ error: '搜索词典失败' }, { status: 500 })
-    }
-
     return NextResponse.json(
       {
         documents: docs || [],
-        dictionary: dict || [],
+        dictionary: [],
         total: docsCount || 0,
         page,
         limit
