@@ -5,13 +5,11 @@ import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 
-// 动态导入 ReactQuill，确保只在客户端加载
 const ReactQuill = dynamic(
   () => import('react-quill'),
   { ssr: false }
 )
 
-// 动态导入样式
 if (typeof window !== 'undefined') {
   require('quill/dist/quill.snow.css')
 }
@@ -28,24 +26,18 @@ export default function AdminPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [passwordError, setPasswordError] = useState('')
   const [passwordSuccess, setPasswordSuccess] = useState('')
-  // 反馈管理状态
   const [feedbacks, setFeedbacks] = useState<any[]>([])
   const [showFeedbacks, setShowFeedbacks] = useState(false)
   const router = useRouter()
 
-  // 身份验证检查
   useEffect(() => {
-    // 检查是否已登录
     const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true'
     if (!isLoggedIn) {
-      // 跳转到登录页面
       router.push('/admin/login')
     }
   }, [router])
 
-  // 获取待审核文献
   useEffect(() => {
-    // 只有登录后才获取数据
     const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true'
     if (!isLoggedIn) return
 
@@ -67,9 +59,7 @@ export default function AdminPage() {
     fetchPendingDocuments()
   }, [])
 
-  // 获取用户反馈
   useEffect(() => {
-    // 只有登录后且需要显示反馈时才获取数据
     const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true'
     if (!isLoggedIn || !showFeedbacks) return
 
@@ -89,7 +79,6 @@ export default function AdminPage() {
     fetchFeedbacks()
   }, [showFeedbacks])
 
-  // 审核通过
   async function handleApprove(id: string) {
     setActionLoading(id)
 
@@ -102,14 +91,12 @@ export default function AdminPage() {
       console.error('审核通过失败:', error)
       alert('审核通过失败，请重试')
     } else {
-      // 更新本地状态
       setPendingDocuments(pendingDocuments.filter(doc => doc.id !== id))
     }
 
     setActionLoading(null)
   }
 
-  // 审核拒绝
   async function handleReject(id: string) {
     setActionLoading(id)
 
@@ -122,20 +109,17 @@ export default function AdminPage() {
       console.error('审核拒绝失败:', error)
       alert('审核拒绝失败，请重试')
     } else {
-      // 更新本地状态
       setPendingDocuments(pendingDocuments.filter(doc => doc.id !== id))
     }
 
     setActionLoading(null)
   }
 
-  // 进入编辑模式
   function handleEdit(doc: any) {
     setEditMode(doc.id)
     setEditedDocument({ ...doc })
   }
 
-  // 保存编辑
   async function handleSaveEdit(id: string) {
     setActionLoading(id)
 
@@ -156,7 +140,6 @@ export default function AdminPage() {
       console.error('保存编辑失败:', error)
       alert('保存编辑失败，请重试')
     } else {
-      // 更新本地状态
       setPendingDocuments(pendingDocuments.map(doc => 
         doc.id === id ? editedDocument : doc
       ))
@@ -167,13 +150,11 @@ export default function AdminPage() {
     setActionLoading(null)
   }
 
-  // 取消编辑
   function handleCancelEdit() {
     setEditMode(null)
     setEditedDocument(null)
   }
 
-  // 编辑后通过
   async function handleEditAndApprove(id: string) {
     setActionLoading(id)
 
@@ -195,7 +176,6 @@ export default function AdminPage() {
       console.error('编辑并通过失败:', error)
       alert('编辑并通过失败，请重试')
     } else {
-      // 更新本地状态
       setPendingDocuments(pendingDocuments.filter(doc => doc.id !== id))
       setEditMode(null)
       setEditedDocument(null)
@@ -204,11 +184,9 @@ export default function AdminPage() {
     setActionLoading(null)
   }
 
-  // 修改密码
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault()
     
-    // 验证输入
     if (!currentPassword || !newPassword || !confirmPassword) {
       setPasswordError('请填写所有密码字段')
       return
@@ -219,7 +197,6 @@ export default function AdminPage() {
       return
     }
 
-    // 获取当前存储的密码
     const storedPassword = localStorage.getItem('adminPassword') || 'admin123'
 
     if (currentPassword !== storedPassword) {
@@ -227,23 +204,19 @@ export default function AdminPage() {
       return
     }
 
-    // 保存新密码
     localStorage.setItem('adminPassword', newPassword)
     setPasswordSuccess('密码修改成功')
     setPasswordError('')
     
-    // 重置表单
     setCurrentPassword('')
     setNewPassword('')
     setConfirmPassword('')
     
-    // 3秒后清除成功提示
     setTimeout(() => {
       setPasswordSuccess('')
     }, 3000)
   }
 
-  // 标记反馈为已处理
   async function handleMarkFeedbackAsProcessed(feedbackId: string) {
     const { error } = await supabase
       .from('feedbacks')
@@ -254,82 +227,85 @@ export default function AdminPage() {
       console.error('标记反馈为已处理失败:', error)
       alert('操作失败，请重试')
     } else {
-      // 更新本地状态
       setFeedbacks(feedbacks.map(feedback => 
         feedback.id === feedbackId ? { ...feedback, status: 'processed' } : feedback
       ))
     }
   }
 
-  // 编辑反馈对应的文献
   function handleEditDocumentFromFeedback(documentId: string) {
-    // 查找对应的文献
     const document = pendingDocuments.find(doc => doc.id === documentId)
     if (document) {
       setEditMode(document.id)
       setEditedDocument({ ...document })
-      // 切换到待审核文献视图
       setShowFeedbacks(false)
     } else {
-      // 如果文献不在待审核列表中，可能已经通过或拒绝，需要从所有文献中查找
       alert('该文献可能已经处理，无法直接编辑')
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-12">
+    <div className="min-h-screen bg-paper-50">
+      <main className="max-w-4xl mx-auto py-16 px-6 sm:px-8 lg:px-12">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-12">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+            <div className="decorative-line mb-6"></div>
+            <h1 className="text-3xl sm:text-4xl font-serif font-semibold text-ink-900">
               管理员审核
             </h1>
-            <p className="mt-2 text-lg text-gray-500">
-              审核待处理的文献
+            <p className="mt-3 text-ink-700/60">
+              审核待处理的文献与用户反馈
             </p>
           </div>
-          <div className="flex space-x-3">
+          <div className="flex flex-wrap gap-3">
             <button
               onClick={() => setShowFeedbacks(!showFeedbacks)}
-              className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+              className={`px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 ${
+                showFeedbacks 
+                  ? 'bg-accent-jade text-white shadow-paper' 
+                  : 'bg-paper-100 text-ink-800 border border-paper-200 hover:bg-paper-200'
+              }`}
             >
               {showFeedbacks ? '查看待审核文献' : '查看用户反馈'}
             </button>
             <button
               onClick={() => setShowPasswordForm(!showPasswordForm)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className={`px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 ${
+                showPasswordForm 
+                  ? 'bg-ink-800 text-white shadow-paper' 
+                  : 'bg-paper-100 text-ink-800 border border-paper-200 hover:bg-paper-200'
+              }`}
             >
               {showPasswordForm ? '取消修改密码' : '修改密码'}
             </button>
           </div>
         </div>
 
-        {/* 密码修改表单 */}
         {showPasswordForm && (
-          <div className="bg-white p-6 rounded-lg shadow mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">修改管理员密码</h2>
+          <div className="paper-card p-8 mb-10">
+            <h2 className="text-xl font-serif font-semibold text-ink-900 mb-6">修改管理员密码</h2>
             
             {passwordError && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                <p>{passwordError}</p>
+              <div className="bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-xl mb-6 text-sm">
+                {passwordError}
               </div>
             )}
             
             {passwordSuccess && (
-              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                <p>{passwordSuccess}</p>
+              <div className="bg-accent-jade/10 border border-accent-jade/20 text-accent-jade px-5 py-4 rounded-xl mb-6 text-sm">
+                {passwordSuccess}
               </div>
             )}
             
-            <form onSubmit={handleChangePassword} className="space-y-4">
+            <form onSubmit={handleChangePassword} className="space-y-6">
               <div>
-                <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="currentPassword" className="block text-sm font-medium text-ink-800 mb-3">
                   当前密码
                 </label>
                 <input
                   type="password"
                   id="currentPassword"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="input-field"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   required
@@ -337,13 +313,13 @@ export default function AdminPage() {
               </div>
               
               <div>
-                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="newPassword" className="block text-sm font-medium text-ink-800 mb-3">
                   新密码
                 </label>
                 <input
                   type="password"
                   id="newPassword"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="input-field"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
@@ -351,13 +327,13 @@ export default function AdminPage() {
               </div>
               
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-ink-800 mb-3">
                   确认新密码
                 </label>
                 <input
                   type="password"
                   id="confirmPassword"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="input-field"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -366,7 +342,7 @@ export default function AdminPage() {
               
               <button
                 type="submit"
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                className="btn-primary"
               >
                 确认修改
               </button>
@@ -374,50 +350,55 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* 反馈管理 */}
         {showFeedbacks && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">用户反馈</h2>
+          <div className="mb-10">
+            <div className="flex items-center gap-4 mb-8">
+              <h2 className="section-title">用户反馈</h2>
+              <div className="flex-1 h-px bg-paper-200"></div>
+            </div>
             {feedbacks.length === 0 ? (
-              <div className="bg-white p-6 rounded-lg shadow text-center">
-                <p className="text-gray-500">暂无用户反馈</p>
+              <div className="paper-card p-10 text-center">
+                <p className="text-ink-700/60">暂无用户反馈</p>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-5">
                 {feedbacks.map((feedback) => (
-                  <div key={feedback.id} className="bg-white p-6 rounded-lg shadow">
-                    <div className="flex justify-between items-start mb-4">
+                  <div key={feedback.id} className="paper-card p-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          文献: {feedback.document_title}
+                        <h3 className="text-lg font-serif font-medium text-ink-900">
+                          {feedback.document_title}
                         </h3>
-                        <p className="text-sm text-gray-500 mt-1">
-                          提交时间: {new Date(feedback.created_at).toLocaleString()}
-                        </p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          状态: {feedback.status === 'pending' ? '待处理' : '已处理'}
-                        </p>
+                        <div className="flex flex-wrap gap-4 mt-2 text-sm text-ink-700/60">
+                          <span>{new Date(feedback.created_at).toLocaleDateString('zh-CN')}</span>
+                          <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            feedback.status === 'pending' 
+                              ? 'bg-accent-gold/10 text-accent-gold' 
+                              : 'bg-accent-jade/10 text-accent-jade'
+                          }`}>
+                            {feedback.status === 'pending' ? '待处理' : '已处理'}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex space-x-2">
+                      <div className="flex gap-2">
                         <button
                           onClick={() => handleEditDocumentFromFeedback(feedback.document_id)}
-                          className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                          className="px-4 py-2 bg-ink-800 text-white rounded-xl text-sm font-medium hover:bg-ink-900 transition-all duration-300"
                         >
                           编辑文献
                         </button>
                         {feedback.status === 'pending' && (
                           <button
                             onClick={() => handleMarkFeedbackAsProcessed(feedback.id)}
-                            className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm"
+                            className="px-4 py-2 bg-accent-jade text-white rounded-xl text-sm font-medium hover:bg-accent-jade/90 transition-all duration-300"
                           >
-                            标记为已处理
+                            标记已处理
                           </button>
                         )}
                       </div>
                     </div>
-                    <div className="mt-4">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">反馈内容:</h4>
-                      <p className="text-gray-600 whitespace-pre-line">{feedback.content}</p>
+                    <div className="pt-4 border-t border-paper-200">
+                      <p className="text-ink-700/80 text-sm whitespace-pre-line leading-relaxed">{feedback.content}</p>
                     </div>
                   </div>
                 ))}
@@ -427,30 +408,35 @@ export default function AdminPage() {
         )}
 
         {!showFeedbacks && loading ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">加载中...</p>
+          <div className="text-center py-20">
+            <div className="inline-flex items-center gap-3 text-ink-700/60">
+              <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>加载中...</span>
+            </div>
           </div>
         ) : !showFeedbacks && pendingDocuments.length === 0 ? (
-          <div className="bg-white p-6 rounded-lg shadow text-center">
-            <p className="text-gray-500">暂无待审核的文献</p>
+          <div className="paper-card p-10 text-center">
+            <p className="text-ink-700/60">暂无待审核的文献</p>
           </div>
         ) : !showFeedbacks && (
           <div className="space-y-6">
             {pendingDocuments.map((doc) => (
-              <div key={doc.id} className="bg-white p-6 rounded-lg shadow">
+              <div key={doc.id} className="paper-card p-6">
                 {editMode === doc.id ? (
-                  // 编辑模式
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">编辑文献</h3>
-                    <div className="space-y-4">
+                    <h3 className="text-xl font-serif font-semibold text-ink-900 mb-6">编辑文献</h3>
+                    <div className="space-y-6">
                       <div>
-                        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="title" className="block text-sm font-medium text-ink-800 mb-3">
                           文书标题
                         </label>
                         <input
                           type="text"
                           id="title"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="input-field"
                           value={editedDocument?.title || ''}
                           onChange={(e) => setEditedDocument({ ...editedDocument, title: e.target.value })}
                           required
@@ -458,13 +444,13 @@ export default function AdminPage() {
                       </div>
                       
                       <div>
-                        <label htmlFor="document_number" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="document_number" className="block text-sm font-medium text-ink-800 mb-3">
                           文书编号
                         </label>
                         <input
                           type="text"
                           id="document_number"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="input-field"
                           value={editedDocument?.document_number || ''}
                           onChange={(e) => setEditedDocument({ ...editedDocument, document_number: e.target.value })}
                           required
@@ -472,13 +458,13 @@ export default function AdminPage() {
                       </div>
                       
                       <div>
-                        <label htmlFor="period" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="period" className="block text-sm font-medium text-ink-800 mb-3">
                           所属年代
                         </label>
                         <input
                           type="text"
                           id="period"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="input-field"
                           value={editedDocument?.period || ''}
                           onChange={(e) => setEditedDocument({ ...editedDocument, period: e.target.value })}
                           required
@@ -486,10 +472,10 @@ export default function AdminPage() {
                       </div>
                       
                       <div>
-                        <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="content" className="block text-sm font-medium text-ink-800 mb-3">
                           文书释文
                         </label>
-                        <div className="w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div className="bg-white border border-paper-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-accent-bronze/20 focus-within:border-accent-bronze/40 transition-all duration-200">
                           <ReactQuill
                             id="content"
                             value={editedDocument?.content || ''}
@@ -518,13 +504,13 @@ export default function AdminPage() {
                       </div>
                       
                       <div>
-                        <label htmlFor="page_number" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="page_number" className="block text-sm font-medium text-ink-800 mb-3">
                           所在页码
                         </label>
                         <input
                           type="text"
                           id="page_number"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="input-field"
                           value={editedDocument?.page_number || ''}
                           onChange={(e) => setEditedDocument({ ...editedDocument, page_number: e.target.value })}
                           required
@@ -532,51 +518,50 @@ export default function AdminPage() {
                       </div>
                       
                       <div>
-                        <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="comment" className="block text-sm font-medium text-ink-800 mb-3">
                           文献注释
                         </label>
                         <textarea
                           id="comment"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          rows={4}
+                          className="input-field min-h-[6rem]"
                           value={editedDocument?.comment || ''}
                           onChange={(e) => setEditedDocument({ ...editedDocument, comment: e.target.value })}
-                        />
+                        ></textarea>
                       </div>
                       
                       <div>
-                        <label htmlFor="image_url" className="block text-sm font-medium text-gray-700 mb-1">
-                          图片URL（用于异体字或无法打出的字）
+                        <label htmlFor="image_url" className="block text-sm font-medium text-ink-800 mb-3">
+                          图片URL
                         </label>
                         <input
                           type="text"
                           id="image_url"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="input-field"
                           value={editedDocument?.image_url || ''}
                           onChange={(e) => setEditedDocument({ ...editedDocument, image_url: e.target.value })}
-                          placeholder="请输入图片URL（可选）"
+                          placeholder="用于异体字或无法打出的字（可选）"
                         />
                       </div>
                     </div>
                     
-                    <div className="flex space-x-2 mt-6">
+                    <div className="flex flex-wrap gap-3 mt-8">
                       <button
                         onClick={() => handleEditAndApprove(doc.id)}
-                        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                        className="px-5 py-2.5 bg-accent-jade text-white rounded-xl font-medium hover:bg-accent-jade/90 transition-all duration-300"
                         disabled={actionLoading === doc.id}
                       >
                         {actionLoading === doc.id ? '处理中...' : '保存并通过'}
                       </button>
                       <button
                         onClick={() => handleSaveEdit(doc.id)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                        className="px-5 py-2.5 bg-ink-800 text-white rounded-xl font-medium hover:bg-ink-900 transition-all duration-300"
                         disabled={actionLoading === doc.id}
                       >
                         {actionLoading === doc.id ? '处理中...' : '保存'}
                       </button>
                       <button
                         onClick={handleCancelEdit}
-                        className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                        className="btn-secondary"
                         disabled={actionLoading === doc.id}
                       >
                         取消
@@ -584,44 +569,57 @@ export default function AdminPage() {
                     </div>
                   </div>
                 ) : (
-                  // 查看模式
-                  <div className="flex flex-col md:flex-row justify-between items-start">
-                    <div className="flex-1 mb-4 md:mb-0">
-                      <h3 className="text-xl font-semibold text-gray-900">{doc.title}</h3>
-                      <div className="mt-2 space-y-1 text-sm text-gray-600">
-                        <p>文书编号: {doc.document_number}</p>
-                        <p>所属年代: {doc.period}</p>
-                        <div className="mt-2" dangerouslySetInnerHTML={{ __html: doc.content.substring(0, 400) + '...' }}></div>
-                        <p>所在页码: {doc.page_number}</p>
-                        {doc.comment && <p className="whitespace-pre-line">文献注释: {doc.comment}</p>}
+                  <div className="flex flex-col lg:flex-row justify-between items-start gap-6">
+                    <div className="flex-1">
+                      <h3 className="document-title text-xl mb-4">{doc.title}</h3>
+                      <div className="space-y-2 text-sm text-ink-700/80">
+                        <p className="flex items-start gap-2">
+                          <span className="text-ink-700/50 min-w-[5rem]">文书编号</span>
+                          <span className="font-serif">{doc.document_number}</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                          <span className="text-ink-700/50 min-w-[5rem]">所属年代</span>
+                          <span className="font-serif">{doc.period}</span>
+                        </p>
+                        <div className="mt-3 pt-3 border-t border-paper-200">
+                          <div className="document-content text-sm" dangerouslySetInnerHTML={{ __html: doc.content.substring(0, 300) + '...' }}></div>
+                        </div>
+                        <p className="flex items-start gap-2 mt-3">
+                          <span className="text-ink-700/50 min-w-[5rem]">所在页码</span>
+                          <span>{doc.page_number}</span>
+                        </p>
+                        {doc.comment && (
+                          <p className="mt-3 pt-3 border-t border-paper-200 whitespace-pre-line text-ink-700/70">
+                            <span className="text-ink-700/50">注释：</span>{doc.comment}
+                          </p>
+                        )}
                         {doc.image_url && (
-                          <div className="mt-2">
-                            <p>图片: </p>
-                            <img src={doc.image_url} alt="文献图片" className="max-w-full h-auto rounded" />
+                          <div className="mt-4 pt-4 border-t border-paper-200">
+                            <img src={doc.image_url} alt="文献图片" className="max-w-full h-auto rounded-lg shadow-paper" />
                           </div>
                         )}
                       </div>
-                      <p className="mt-4 text-sm text-gray-500">
-                        提交时间: {new Date(doc.created_at).toLocaleString()}
+                      <p className="mt-5 pt-4 border-t border-paper-200 text-xs text-ink-700/40">
+                        提交时间: {new Date(doc.created_at).toLocaleString('zh-CN')}
                       </p>
                     </div>
-                    <div className="flex space-x-2">
+                    <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => handleEdit(doc)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                        className="px-4 py-2 bg-ink-800 text-white rounded-xl text-sm font-medium hover:bg-ink-900 transition-all duration-300"
                       >
                         编辑
                       </button>
                       <button
                         onClick={() => handleApprove(doc.id)}
-                        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                        className="px-4 py-2 bg-accent-jade text-white rounded-xl text-sm font-medium hover:bg-accent-jade/90 transition-all duration-300"
                         disabled={actionLoading === doc.id}
                       >
                         {actionLoading === doc.id ? '处理中...' : '通过'}
                       </button>
                       <button
                         onClick={() => handleReject(doc.id)}
-                        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                        className="px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-medium hover:bg-red-600 transition-all duration-300"
                         disabled={actionLoading === doc.id}
                       >
                         {actionLoading === doc.id ? '处理中...' : '拒绝'}
@@ -634,14 +632,23 @@ export default function AdminPage() {
           </div>
         )}
 
-        <div className="mt-8 text-center">
+        <div className="mt-12 text-center">
           <a
             href="/"
-            className="text-blue-600 hover:text-blue-800 transition-colors"
+            className="inline-flex items-center gap-2 text-ink-700/60 hover:text-ink-800 transition-colors text-sm"
           >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-4 w-4">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
             返回首页
           </a>
         </div>
+
+        <footer className="mt-16 pt-8 border-t border-paper-200 text-center">
+          <p className="text-ink-700/40 text-sm">
+            敦煌吐鲁番文献检索与上传系统 © {new Date().getFullYear()}
+          </p>
+        </footer>
       </main>
     </div>
   )

@@ -1,13 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-rgb: 255, 255, 255;
+  --foreground-rgb: 45, 45, 45;
+  --background-rgb: 250, 249, 247;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
+  font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+  .paper-card {
+    @apply bg-white/80 backdrop-blur-sm rounded-2xl shadow-paper border border-paper-200/50;
+  }
+  
+  .paper-card-hover {
+    @apply paper-card transition-all duration-300 hover:shadow-paper-md hover:border-paper-300/60;
+  }
+  
+  .document-title {
+    @apply font-serif text-ink-900 font-semibold tracking-wide;
+  }
+  
+  .document-content {
+    @apply font-serif text-ink-800 leading-relaxed;
+  }
+  
+  .btn-primary {
+    @apply px-6 py-3 bg-ink-800 text-white rounded-xl font-medium transition-all duration-300 hover:bg-ink-900 hover:shadow-lg active:scale-[0.98];
+  }
+  
+  .btn-secondary {
+    @apply px-6 py-3 bg-paper-100 text-ink-800 rounded-xl font-medium border border-paper-200 transition-all duration-300 hover:bg-paper-200 hover:border-paper-300;
+  }
+  
+  .input-field {
+    @apply w-full px-5 py-4 bg-white border border-paper-200 rounded-xl text-ink-800 placeholder-ink-700/40 focus:outline-none focus:ring-2 focus:ring-accent-bronze/30 focus:border-accent-bronze/50 transition-all duration-200;
+  }
+  
+  .section-title {
+    @apply text-2xl font-serif font-semibold text-ink-900 tracking-wide;
+  }
+  
+  .decorative-line {
+    @apply w-16 h-0.5 bg-gradient-to-r from-accent-gold to-accent-bronze rounded-full;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-bronze via-accent-gold to-accent-bronze;
+  }
 }

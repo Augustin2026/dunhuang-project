@@ -4,13 +4,11 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import dynamic from 'next/dynamic'
 
-// 动态导入 ReactQuill，确保只在客户端加载
 const ReactQuill = dynamic(
   () => import('react-quill'),
   { ssr: false }
 )
 
-// 动态导入样式
 if (typeof window !== 'undefined') {
   require('quill/dist/quill.snow.css')
 }
@@ -21,7 +19,6 @@ export default function Home() {
   const [documentResults, setDocumentResults] = useState<any[]>([])
   const [dictionaryResults, setDictionaryResults] = useState<any[]>([])
   const [showResults, setShowResults] = useState(false)
-  // 上传表单状态
   const [title, setTitle] = useState('')
   const [documentNumber, setDocumentNumber] = useState('')
   const [period, setPeriod] = useState('')
@@ -31,7 +28,6 @@ export default function Home() {
   const [imageUrl, setImageUrl] = useState('')
   const [uploading, setUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
-  // 反馈表单状态
   const [showFeedbackForm, setShowFeedbackForm] = useState(false)
   const [currentDocumentId, setCurrentDocumentId] = useState('')
   const [currentDocumentTitle, setCurrentDocumentTitle] = useState('')
@@ -39,14 +35,12 @@ export default function Home() {
   const [submittingFeedback, setSubmittingFeedback] = useState(false)
   const [feedbackSuccess, setFeedbackSuccess] = useState(false)
 
-  // 搜索功能
   async function handleSearch() {
     if (!searchTerm.trim()) return
 
     setLoading(true)
     setShowResults(true)
 
-    // 搜索文献（只搜索已通过审核的）
     const { data: docs, error: docsError } = await supabase
       .from('documents')
       .select('*')
@@ -61,7 +55,6 @@ export default function Home() {
       setDocumentResults(docs)
     }
 
-    // 搜索词典
     const { data: dict, error: dictError } = await supabase
       .from('dictionary')
       .select('*')
@@ -78,18 +71,15 @@ export default function Home() {
     setLoading(false)
   }
 
-  // 处理回车搜索
   function handleKeyPress(e: React.KeyboardEvent) {
     if (e.key === 'Enter') {
       handleSearch()
     }
   }
 
-  // 上传文献
   async function handleUpload(e: React.FormEvent) {
     e.preventDefault()
     
-    // 验证所有字段都已填写
     if (!title.trim() || !documentNumber.trim() || !period.trim() || !content.trim() || !pageNumber.trim()) {
       alert('请填写完整的文献信息')
       return
@@ -97,7 +87,6 @@ export default function Home() {
 
     setUploading(true)
 
-    // 检查是否存在重复的文书标题或编号
     const { data: existingDocs, error: checkError } = await supabase
       .from('documents')
       .select('id')
@@ -117,7 +106,6 @@ export default function Home() {
       return
     }
 
-    // 插入新文献
     const { data, error } = await supabase
       .from('documents')
       .insert({
@@ -128,7 +116,7 @@ export default function Home() {
         page_number: pageNumber,
         comment,
         image_url: imageUrl,
-        status: 'pending' // 自动设置为待审核状态
+        status: 'pending'
       })
       .select()
       .single()
@@ -138,7 +126,6 @@ export default function Home() {
       alert('上传失败，请重试')
     } else {
       setUploadSuccess(true)
-      // 清空表单
       setTitle('')
       setDocumentNumber('')
       setPeriod('')
@@ -146,7 +133,6 @@ export default function Home() {
       setPageNumber('')
       setComment('')
       setImageUrl('')
-      // 3秒后重置成功状态
       setTimeout(() => {
         setUploadSuccess(false)
       }, 3000)
@@ -155,7 +141,6 @@ export default function Home() {
     setUploading(false)
   }
 
-  // 处理发现错误按钮点击
   function handleReportError(docId: string, docTitle: string) {
     setCurrentDocumentId(docId)
     setCurrentDocumentTitle(docTitle)
@@ -163,7 +148,6 @@ export default function Home() {
     setShowFeedbackForm(true)
   }
 
-  // 处理提交反馈
   async function handleSubmitFeedback(e: React.FormEvent) {
     e.preventDefault()
 
@@ -174,14 +158,13 @@ export default function Home() {
 
     setSubmittingFeedback(true)
 
-    // 插入反馈记录
     const { error } = await supabase
       .from('feedbacks')
       .insert({
         document_id: currentDocumentId,
         document_title: currentDocumentTitle,
         content: feedbackContent,
-        status: 'pending' // 自动设置为待处理状态
+        status: 'pending'
       })
 
     if (error) {
@@ -189,7 +172,6 @@ export default function Home() {
       alert('提交反馈失败，请重试')
     } else {
       setFeedbackSuccess(true)
-      // 3秒后重置成功状态并关闭表单
       setTimeout(() => {
         setFeedbackSuccess(false)
         setShowFeedbackForm(false)
@@ -200,41 +182,41 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      <main className="max-w-6xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-        {/* 右上角审核按钮 */}
-        <div className="flex justify-end mb-12">
+    <div className="min-h-screen bg-paper-50">
+      <main className="max-w-6xl mx-auto py-20 px-6 sm:px-8 lg:px-12">
+        <div className="flex justify-end mb-16">
           <a
             href="/admin"
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
+            className="px-5 py-2.5 bg-ink-800/90 text-white rounded-xl font-medium text-sm hover:bg-ink-900 transition-all duration-300 shadow-paper hover:shadow-paper-md"
           >
-            审核
+            管理
           </a>
         </div>
         
-        {/* 首页搜索框 */}
-        <div className="text-center max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl mb-6">
+        <div className="text-center max-w-4xl mx-auto mb-20">
+          <div className="mb-8">
+            <div className="decorative-line mx-auto mb-8"></div>
+          </div>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-semibold text-ink-900 mb-8 tracking-wide leading-tight">
             敦煌吐鲁番出土文献检索系统
           </h1>
-          <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
+          <p className="text-lg text-ink-700/80 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
             汇聚敦煌吐鲁番历史文献，为研究人员和爱好者提供便捷的文献访问方式
           </p>
           
-          {/* 现代风格搜索框 */}
           <div className="max-w-2xl mx-auto">
-            <div className="relative">
+            <div className="relative group">
               <input
                 type="text"
-                placeholder="搜索文献..."
-                className="w-full px-5 py-4 pr-14 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
+                placeholder="搜索文献标题、编号、年代或内容..."
+                className="w-full px-6 py-5 pr-16 bg-white border border-paper-200 rounded-2xl text-ink-800 placeholder-ink-700/40 focus:outline-none focus:ring-2 focus:ring-accent-bronze/20 focus:border-accent-bronze/40 shadow-paper transition-all duration-300"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={handleKeyPress}
               />
               <button
                 onClick={handleSearch}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-ink-800 text-white p-3 rounded-xl hover:bg-ink-900 transition-all duration-300 shadow-paper hover:shadow-paper-md active:scale-95"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-5 w-5">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -244,49 +226,73 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 搜索结果 */}
         {showResults && (
-          <div className="mt-16">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">搜索结果</h2>
+          <div className="mb-20">
+            <div className="flex items-center gap-4 mb-10">
+              <h2 className="section-title">搜索结果</h2>
+              <div className="flex-1 h-px bg-paper-200"></div>
+            </div>
             
             {loading ? (
-              <div className="text-center py-16">
-                <p className="text-gray-500">搜索中...</p>
+              <div className="text-center py-20">
+                <div className="inline-flex items-center gap-3 text-ink-700/60">
+                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>搜索中...</span>
+                </div>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 gap-8">
-                {/* 文献结果 */}
+              <div className="grid md:grid-cols-2 gap-10">
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-4">文献结果</h3>
+                  <h3 className="text-lg font-serif font-medium text-ink-800 mb-6 flex items-center gap-3">
+                    <span className="w-1.5 h-1.5 bg-accent-gold rounded-full"></span>
+                    文献结果
+                  </h3>
                   {documentResults.length === 0 ? (
-                    <div className="bg-white p-6 rounded-xl shadow-sm text-center">
-                      <p className="text-gray-500">未找到相关文献</p>
+                    <div className="paper-card p-10 text-center">
+                      <p className="text-ink-700/60">未找到相关文献</p>
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-5">
                       {documentResults.map((doc) => (
-                        <div key={doc.id} className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                          <h4 className="font-medium text-gray-900">{doc.title}</h4>
-                          <div className="mt-2 space-y-1 text-sm text-gray-600">
-                            <p>文书编号: {doc.document_number}</p>
-                            <p>所属年代: {doc.period}</p>
-                            <div className="mt-2" dangerouslySetInnerHTML={{ __html: doc.content.substring(0, 300) + '...' }}></div>
-                            <p>所在页码: {doc.page_number}</p>
-                            {doc.comment && <p className="whitespace-pre-line">文献注释: {doc.comment}</p>}
+                        <div key={doc.id} className="paper-card-hover p-6">
+                          <h4 className="document-title text-lg mb-4">{doc.title}</h4>
+                          <div className="space-y-2 text-sm text-ink-700/80">
+                            <p className="flex items-start gap-2">
+                              <span className="text-ink-700/50 min-w-[5rem]">文书编号</span>
+                              <span className="font-serif">{doc.document_number}</span>
+                            </p>
+                            <p className="flex items-start gap-2">
+                              <span className="text-ink-700/50 min-w-[5rem]">所属年代</span>
+                              <span className="font-serif">{doc.period}</span>
+                            </p>
+                            <div className="mt-3 pt-3 border-t border-paper-200">
+                              <div className="document-content text-sm" dangerouslySetInnerHTML={{ __html: doc.content.substring(0, 250) + '...' }}></div>
+                            </div>
+                            <p className="flex items-start gap-2 mt-3">
+                              <span className="text-ink-700/50 min-w-[5rem]">所在页码</span>
+                              <span>{doc.page_number}</span>
+                            </p>
+                            {doc.comment && (
+                              <p className="mt-3 pt-3 border-t border-paper-200 whitespace-pre-line text-ink-700/70">
+                                <span className="text-ink-700/50">注释：</span>{doc.comment}
+                              </p>
+                            )}
                             {doc.image_url && (
-                              <div className="mt-2">
-                                <p>图片: </p>
-                                <img src={doc.image_url} alt="文献图片" className="max-w-full h-auto rounded" />
+                              <div className="mt-4 pt-4 border-t border-paper-200">
+                                <img src={doc.image_url} alt="文献图片" className="max-w-full h-auto rounded-lg shadow-paper" />
                               </div>
                             )}
                           </div>
-                          <div className="mt-4 flex justify-between items-center">
-                            <p className="text-xs text-gray-400">
-                              创建时间: {new Date(doc.created_at).toLocaleString()}
+                          <div className="mt-5 pt-4 border-t border-paper-200 flex justify-between items-center">
+                            <p className="text-xs text-ink-700/40">
+                              {new Date(doc.created_at).toLocaleDateString('zh-CN')}
                             </p>
                             <button
                               onClick={() => handleReportError(doc.id, doc.title)}
-                              className="text-sm text-blue-600 hover:text-blue-800"
+                              className="text-sm text-accent-bronze hover:text-accent-gold transition-colors font-medium"
                             >
                               发现错误
                             </button>
@@ -297,21 +303,23 @@ export default function Home() {
                   )}
                 </div>
 
-                {/* 词典结果 */}
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-4">词典结果</h3>
+                  <h3 className="text-lg font-serif font-medium text-ink-800 mb-6 flex items-center gap-3">
+                    <span className="w-1.5 h-1.5 bg-accent-jade rounded-full"></span>
+                    词典结果
+                  </h3>
                   {dictionaryResults.length === 0 ? (
-                    <div className="bg-white p-6 rounded-xl shadow-sm text-center">
-                      <p className="text-gray-500">未找到相关词典条目</p>
+                    <div className="paper-card p-10 text-center">
+                      <p className="text-ink-700/60">未找到相关词典条目</p>
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-5">
                       {dictionaryResults.map((item) => (
-                        <div key={item.id} className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                          <h4 className="font-medium text-gray-900">{item.word}</h4>
-                          <p className="mt-2 text-sm text-gray-600">{item.definition}</p>
-                          <p className="mt-3 text-xs text-gray-400">
-                            创建时间: {new Date(item.created_at).toLocaleString()}
+                        <div key={item.id} className="paper-card-hover p-6">
+                          <h4 className="document-title text-lg mb-3">{item.word}</h4>
+                          <p className="text-ink-700/80 text-sm leading-relaxed">{item.definition}</p>
+                          <p className="mt-4 pt-4 border-t border-paper-200 text-xs text-ink-700/40">
+                            {new Date(item.created_at).toLocaleDateString('zh-CN')}
                           </p>
                         </div>
                       ))}
@@ -323,31 +331,34 @@ export default function Home() {
           </div>
         )}
 
-        {/* 文献上传 */}
-        <div className="mt-16 max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">文献上传</h2>
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="decorative-line mx-auto mb-6"></div>
+            <h2 className="section-title">文献上传</h2>
+            <p className="mt-4 text-ink-700/60">为数据库贡献新的文献资料</p>
+          </div>
           
           {uploadSuccess ? (
-            <div className="bg-white p-8 rounded-xl shadow-md text-center">
-              <div className="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-8 w-8 text-green-600">
+            <div className="paper-card p-12 text-center">
+              <div className="h-16 w-16 bg-accent-jade/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-8 w-8 text-accent-jade">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">上传成功</h3>
-              <p className="text-gray-500">感谢你的贡献，管理员会尽快审核此条目，通过后就会纳入数据库</p>
+              <h3 className="text-xl font-serif font-semibold text-ink-900 mb-3">上传成功</h3>
+              <p className="text-ink-700/60">感谢你的贡献，管理员会尽快审核此条目，通过后就会纳入数据库</p>
             </div>
           ) : (
-            <form onSubmit={handleUpload} className="bg-white p-8 rounded-xl shadow-md">
-              <div className="space-y-6">
+            <form onSubmit={handleUpload} className="paper-card p-10">
+              <div className="space-y-8">
                 <div>
-                  <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                    文书标题
+                  <label htmlFor="title" className="block text-sm font-medium text-ink-800 mb-3">
+                    文书标题 <span className="text-accent-gold">*</span>
                   </label>
                   <input
                     type="text"
                     id="title"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="input-field"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="请输入文书标题"
@@ -356,13 +367,13 @@ export default function Home() {
                 </div>
                 
                 <div>
-                  <label htmlFor="documentNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                    文书编号
+                  <label htmlFor="documentNumber" className="block text-sm font-medium text-ink-800 mb-3">
+                    文书编号 <span className="text-accent-gold">*</span>
                   </label>
                   <input
                     type="text"
                     id="documentNumber"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="input-field"
                     value={documentNumber}
                     onChange={(e) => setDocumentNumber(e.target.value)}
                     placeholder="请输入文书编号"
@@ -371,13 +382,13 @@ export default function Home() {
                 </div>
                 
                 <div>
-                  <label htmlFor="period" className="block text-sm font-medium text-gray-700 mb-2">
-                    所属年代
+                  <label htmlFor="period" className="block text-sm font-medium text-ink-800 mb-3">
+                    所属年代 <span className="text-accent-gold">*</span>
                   </label>
                   <input
                     type="text"
                     id="period"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="input-field"
                     value={period}
                     onChange={(e) => setPeriod(e.target.value)}
                     placeholder="请输入所属年代"
@@ -386,10 +397,10 @@ export default function Home() {
                 </div>
                 
                 <div>
-                  <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
-                    文书释文
+                  <label htmlFor="content" className="block text-sm font-medium text-ink-800 mb-3">
+                    文书释文 <span className="text-accent-gold">*</span>
                   </label>
-                  <div className="w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  <div className="bg-white border border-paper-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-accent-bronze/20 focus-within:border-accent-bronze/40 transition-all duration-200">
                     <ReactQuill
                       id="content"
                       value={content}
@@ -418,13 +429,13 @@ export default function Home() {
                 </div>
                 
                 <div>
-                  <label htmlFor="pageNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                    所在页码
+                  <label htmlFor="pageNumber" className="block text-sm font-medium text-ink-800 mb-3">
+                    所在页码 <span className="text-accent-gold">*</span>
                   </label>
                   <input
                     type="text"
                     id="pageNumber"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="input-field"
                     value={pageNumber}
                     onChange={(e) => setPageNumber(e.target.value)}
                     placeholder="请输入所在页码"
@@ -433,13 +444,12 @@ export default function Home() {
                 </div>
                 
                 <div>
-                  <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="comment" className="block text-sm font-medium text-ink-800 mb-3">
                     文献注释
                   </label>
                   <textarea
                     id="comment"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    rows={4}
+                    className="input-field min-h-[6rem]"
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                     placeholder="请输入文献注释（可选）"
@@ -447,23 +457,23 @@ export default function Home() {
                 </div>
                 
                 <div>
-                  <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-2">
-                    图片URL（用于异体字或无法打出的字）
+                  <label htmlFor="imageUrl" className="block text-sm font-medium text-ink-800 mb-3">
+                    图片URL
                   </label>
                   <input
                     type="text"
                     id="imageUrl"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="input-field"
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="请输入图片URL（可选）"
+                    placeholder="用于异体字或无法打出的字（可选）"
                   />
                 </div>
                 
-                <div>
+                <div className="pt-4">
                   <button
                     type="submit"
-                    className="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-colors font-medium"
+                    className="w-full btn-primary"
                     disabled={uploading}
                   >
                     {uploading ? '上传中...' : '提交上传'}
@@ -474,52 +484,50 @@ export default function Home() {
           )}
         </div>
 
-        {/* 反馈表单模态框 */}
         {showFeedbackForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">反馈错误</h3>
-              <p className="text-gray-600 mb-4">
-                文献: {currentDocumentTitle}
+          <div className="fixed inset-0 bg-ink-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-paper-lg">
+              <h3 className="text-xl font-serif font-semibold text-ink-900 mb-2">反馈错误</h3>
+              <p className="text-ink-700/60 text-sm mb-6">
+                文献: <span className="font-serif text-ink-800">{currentDocumentTitle}</span>
               </p>
               
               {feedbackSuccess ? (
-                <div className="text-center py-6">
-                  <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6 text-green-600">
+                <div className="text-center py-8">
+                  <div className="h-14 w-14 bg-accent-jade/10 rounded-full flex items-center justify-center mx-auto mb-5">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-7 w-7 text-accent-jade">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2">反馈成功</h4>
-                  <p className="text-gray-500">感谢你的反馈，管理员会尽快处理</p>
+                  <h4 className="text-lg font-serif font-semibold text-ink-900 mb-2">反馈成功</h4>
+                  <p className="text-ink-700/60 text-sm">感谢你的反馈，管理员会尽快处理</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmitFeedback}>
-                  <div className="mb-4">
-                    <label htmlFor="feedbackContent" className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="mb-6">
+                    <label htmlFor="feedbackContent" className="block text-sm font-medium text-ink-800 mb-3">
                       错误描述
                     </label>
                     <textarea
                       id="feedbackContent"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      rows={4}
+                      className="input-field min-h-[8rem]"
                       value={feedbackContent}
                       onChange={(e) => setFeedbackContent(e.target.value)}
                       placeholder="请详细描述你发现的错误"
                       required
                     ></textarea>
                   </div>
-                  <div className="flex space-x-3">
+                  <div className="flex gap-3">
                     <button
                       type="button"
                       onClick={() => setShowFeedbackForm(false)}
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="flex-1 btn-secondary"
                     >
                       取消
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="flex-1 btn-primary"
                       disabled={submittingFeedback}
                     >
                       {submittingFeedback ? '提交中...' : '提交反馈'}
@@ -531,9 +539,10 @@ export default function Home() {
           </div>
         )}
 
-        {/* 页脚 */}
-        <footer className="mt-24 text-center text-gray-500 text-sm">
-          <p>敦煌吐鲁番文献检索与上传系统 © {new Date().getFullYear()}</p>
+        <footer className="mt-24 pt-10 border-t border-paper-200 text-center">
+          <p className="text-ink-700/40 text-sm">
+            敦煌吐鲁番文献检索与上传系统 © {new Date().getFullYear()}
+          </p>
         </footer>
       </main>
     </div>

@@ -20,14 +20,10 @@ export default function AdminLoginPage() {
     setLoading(true)
     setError('')
 
-    // 获取存储的密码，默认为 admin123
     const storedPassword = localStorage.getItem('adminPassword') || 'admin123'
 
-    // 验证密码
     if (password === storedPassword) {
-      // 存储登录状态到 localStorage
       localStorage.setItem('adminLoggedIn', 'true')
-      // 跳转到审核页面
       router.push('/admin')
     } else {
       setError('密码错误')
@@ -37,50 +33,60 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="max-w-md w-full space-y-8 px-4 py-12 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900">
+    <div className="min-h-screen bg-paper-50 flex items-center justify-center px-6">
+      <div className="max-w-md w-full">
+        <div className="text-center mb-10">
+          <div className="decorative-line mx-auto mb-8"></div>
+          <h2 className="text-3xl font-serif font-semibold text-ink-900">
             管理员登录
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-3 text-ink-700/60">
             请输入管理员密码
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+        <form onSubmit={handleSubmit} className="paper-card p-8">
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              <p>{error}</p>
+            <div className="bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-xl mb-6 text-sm">
+              {error}
             </div>
           )}
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="mb-6">
+            <label htmlFor="password" className="block text-sm font-medium text-ink-800 mb-3">
               密码
             </label>
             <input
               type="password"
               id="password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="input-field"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="请输入管理员密码"
               required
             />
           </div>
 
-          <div>
-            <button
-              type="submit"
-              className="w-full px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-              disabled={loading}
-            >
-              {loading ? '登录中...' : '登录'}
-            </button>
-          </div>
-
-
+          <button
+            type="submit"
+            className="w-full btn-primary"
+            disabled={loading}
+          >
+            {loading ? '登录中...' : '登录'}
+          </button>
         </form>
+
+        <div className="mt-8 text-center">
+          <a
+            href="/"
+            className="inline-flex items-center gap-2 text-ink-700/60 hover:text-ink-800 transition-colors text-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-4 w-4">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            返回首页
+          </a>
+        </div>
       </div>
     </div>
   )
