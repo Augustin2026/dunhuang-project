@@ -31,6 +31,13 @@ export default function Home() {
   const [imageUrl, setImageUrl] = useState('')
   const [uploading, setUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
+  // 反馈表单状态
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false)
+  const [currentDocumentId, setCurrentDocumentId] = useState('')
+  const [currentDocumentTitle, setCurrentDocumentTitle] = useState('')
+  const [feedbackContent, setFeedbackContent] = useState('')
+  const [submittingFeedback, setSubmittingFeedback] = useState(false)
+  const [feedbackSuccess, setFeedbackSuccess] = useState(false)
 
   // 搜索功能
   async function handleSearch() {
@@ -148,6 +155,50 @@ export default function Home() {
     setUploading(false)
   }
 
+  // 处理发现错误按钮点击
+  function handleReportError(docId: string, docTitle: string) {
+    setCurrentDocumentId(docId)
+    setCurrentDocumentTitle(docTitle)
+    setFeedbackContent('')
+    setShowFeedbackForm(true)
+  }
+
+  // 处理提交反馈
+  async function handleSubmitFeedback(e: React.FormEvent) {
+    e.preventDefault()
+
+    if (!feedbackContent.trim()) {
+      alert('请填写反馈内容')
+      return
+    }
+
+    setSubmittingFeedback(true)
+
+    // 插入反馈记录
+    const { error } = await supabase
+      .from('feedbacks')
+      .insert({
+        document_id: currentDocumentId,
+        document_title: currentDocumentTitle,
+        content: feedbackContent,
+        status: 'pending' // 自动设置为待处理状态
+      })
+
+    if (error) {
+      console.error('提交反馈失败:', error)
+      alert('提交反馈失败，请重试')
+    } else {
+      setFeedbackSuccess(true)
+      // 3秒后重置成功状态并关闭表单
+      setTimeout(() => {
+        setFeedbackSuccess(false)
+        setShowFeedbackForm(false)
+      }, 3000)
+    }
+
+    setSubmittingFeedback(false)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <main className="max-w-6xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
@@ -229,9 +280,17 @@ export default function Home() {
                               </div>
                             )}
                           </div>
-                          <p className="mt-3 text-xs text-gray-400">
-                            创建时间: {new Date(doc.created_at).toLocaleString()}
-                          </p>
+                          <div className="mt-4 flex justify-between items-center">
+                            <p className="text-xs text-gray-400">
+                              创建时间: {new Date(doc.created_at).toLocaleString()}
+                            </p>
+                            <button
+                              onClick={() => handleReportError(doc.id, doc.title)}
+                              className="text-sm text-blue-600 hover:text-blue-800"
+                            >
+                              发现错误
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -414,6 +473,63 @@ export default function Home() {
             </form>
           )}
         </div>
+
+        {/* 反馈表单模态框 */}
+        {showFeedbackForm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">反馈错误</h3>
+              <p className="text-gray-600 mb-4">
+                文献: {currentDocumentTitle}
+              </p>
+              
+              {feedbackSuccess ? (
+                <div className="text-center py-6">
+                  <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-6 w-6 text-green-600">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">反馈成功</h4>
+                  <p className="text-gray-500">感谢你的反馈，管理员会尽快处理</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmitFeedback}>
+                  <div className="mb-4">
+                    <label htmlFor="feedbackContent" className="block text-sm font-medium text-gray-700 mb-2">
+                      错误描述
+                    </label>
+                    <textarea
+                      id="feedbackContent"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      rows={4}
+                      value={feedbackContent}
+                      onChange={(e) => setFeedbackContent(e.target.value)}
+                      placeholder="请详细描述你发现的错误"
+                      required
+                    ></textarea>
+                  </div>
+                  <div className="flex space-x-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowFeedbackForm(false)}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      取消
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      disabled={submittingFeedback}
+                    >
+                      {submittingFeedback ? '提交中...' : '提交反馈'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* 页脚 */}
         <footer className="mt-24 text-center text-gray-500 text-sm">

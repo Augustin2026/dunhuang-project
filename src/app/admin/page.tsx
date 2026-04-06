@@ -28,6 +28,9 @@ export default function AdminPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [passwordError, setPasswordError] = useState('')
   const [passwordSuccess, setPasswordSuccess] = useState('')
+  // 反馈管理状态
+  const [feedbacks, setFeedbacks] = useState<any[]>([])
+  const [showFeedbacks, setShowFeedbacks] = useState(false)
   const router = useRouter()
 
   // 身份验证检查
@@ -63,6 +66,28 @@ export default function AdminPage() {
 
     fetchPendingDocuments()
   }, [])
+
+  // 获取用户反馈
+  useEffect(() => {
+    // 只有登录后且需要显示反馈时才获取数据
+    const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true'
+    if (!isLoggedIn || !showFeedbacks) return
+
+    async function fetchFeedbacks() {
+      const { data, error } = await supabase
+        .from('feedbacks')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('获取反馈失败:', error)
+      } else {
+        setFeedbacks(data)
+      }
+    }
+
+    fetchFeedbacks()
+  }, [showFeedbacks])
 
   // 审核通过
   async function handleApprove(id: string) {
@@ -218,6 +243,39 @@ export default function AdminPage() {
     }, 3000)
   }
 
+  // 标记反馈为已处理
+  async function handleMarkFeedbackAsProcessed(feedbackId: string) {
+    const { error } = await supabase
+      .from('feedbacks')
+      .update({ status: 'processed' })
+      .eq('id', feedbackId)
+
+    if (error) {
+      console.error('标记反馈为已处理失败:', error)
+      alert('操作失败，请重试')
+    } else {
+      // 更新本地状态
+      setFeedbacks(feedbacks.map(feedback => 
+        feedback.id === feedbackId ? { ...feedback, status: 'processed' } : feedback
+      ))
+    }
+  }
+
+  // 编辑反馈对应的文献
+  function handleEditDocumentFromFeedback(documentId: string) {
+    // 查找对应的文献
+    const document = pendingDocuments.find(doc => doc.id === documentId)
+    if (document) {
+      setEditMode(document.id)
+      setEditedDocument({ ...document })
+      // 切换到待审核文献视图
+      setShowFeedbacks(false)
+    } else {
+      // 如果文献不在待审核列表中，可能已经通过或拒绝，需要从所有文献中查找
+      alert('该文献可能已经处理，无法直接编辑')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -230,12 +288,20 @@ export default function AdminPage() {
               审核待处理的文献
             </p>
           </div>
-          <button
-            onClick={() => setShowPasswordForm(!showPasswordForm)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-          >
-            {showPasswordForm ? '取消修改密码' : '修改密码'}
-          </button>
+          <div className="flex space-x-3">
+            <button
+              onClick={() => setShowFeedbacks(!showFeedbacks)}
+              className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+            >
+              {showFeedbacks ? '查看待审核文献' : '查看用户反馈'}
+            </button>
+            <button
+              onClick={() => setShowPasswordForm(!showPasswordForm)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              {showPasswordForm ? '取消修改密码' : '修改密码'}
+            </button>
+          </div>
         </div>
 
         {/* 密码修改表单 */}
@@ -308,15 +374,67 @@ export default function AdminPage() {
           </div>
         )}
 
-        {loading ? (
+        {/* 反馈管理 */}
+        {showFeedbacks && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">用户反馈</h2>
+            {feedbacks.length === 0 ? (
+              <div className="bg-white p-6 rounded-lg shadow text-center">
+                <p className="text-gray-500">暂无用户反馈</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {feedbacks.map((feedback) => (
+                  <div key={feedback.id} className="bg-white p-6 rounded-lg shadow">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          文献: {feedback.document_title}
+                        </h3>
+                        <p className="text-sm text-gray-500 mt-1">
+                          提交时间: {new Date(feedback.created_at).toLocaleString()}
+                        </p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          状态: {feedback.status === 'pending' ? '待处理' : '已处理'}
+                        </p>
+                      </div>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleEditDocumentFromFeedback(feedback.document_id)}
+                          className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                        >
+                          编辑文献
+                        </button>
+                        {feedback.status === 'pending' && (
+                          <button
+                            onClick={() => handleMarkFeedbackAsProcessed(feedback.id)}
+                            className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm"
+                          >
+                            标记为已处理
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">反馈内容:</h4>
+                      <p className="text-gray-600 whitespace-pre-line">{feedback.content}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {!showFeedbacks && loading ? (
           <div className="text-center py-12">
             <p className="text-gray-500">加载中...</p>
           </div>
-        ) : pendingDocuments.length === 0 ? (
+        ) : !showFeedbacks && pendingDocuments.length === 0 ? (
           <div className="bg-white p-6 rounded-lg shadow text-center">
             <p className="text-gray-500">暂无待审核的文献</p>
           </div>
-        ) : (
+        ) : !showFeedbacks && (
           <div className="space-y-6">
             {pendingDocuments.map((doc) => (
               <div key={doc.id} className="bg-white p-6 rounded-lg shadow">
