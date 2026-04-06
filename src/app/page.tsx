@@ -23,9 +23,8 @@ export default function Home() {
   const [documentNumber, setDocumentNumber] = useState('')
   const [period, setPeriod] = useState('')
   const [content, setContent] = useState('')
-  const [pageNumber, setPageNumber] = useState('')
   const [comment, setComment] = useState('')
-  const [imageUrl, setImageUrl] = useState('')
+  const [pageNumber, setPageNumber] = useState('')
   const [uploading, setUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
   const [showFeedbackForm, setShowFeedbackForm] = useState(false)
@@ -115,7 +114,6 @@ export default function Home() {
         content,
         page_number: pageNumber,
         comment,
-        image_url: imageUrl,
         status: 'pending'
       })
       .select()
@@ -130,9 +128,8 @@ export default function Home() {
       setDocumentNumber('')
       setPeriod('')
       setContent('')
-      setPageNumber('')
       setComment('')
-      setImageUrl('')
+      setPageNumber('')
       setTimeout(() => {
         setUploadSuccess(false)
       }, 3000)
@@ -280,11 +277,7 @@ export default function Home() {
                                 <span className="text-ink-700/50">注释：</span>{doc.comment}
                               </p>
                             )}
-                            {doc.image_url && (
-                              <div className="mt-4 pt-4 border-t border-paper-200">
-                                <img src={doc.image_url} alt="文献图片" className="max-w-full h-auto rounded-lg shadow-paper" />
-                              </div>
-                            )}
+
                           </div>
                           <div className="mt-5 pt-4 border-t border-paper-200 flex justify-between items-center">
                             <p className="text-xs text-ink-700/40">
@@ -429,21 +422,6 @@ export default function Home() {
                 </div>
                 
                 <div>
-                  <label htmlFor="pageNumber" className="block text-sm font-medium text-ink-800 mb-3">
-                    所在页码 <span className="text-accent-gold">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="pageNumber"
-                    className="input-field"
-                    value={pageNumber}
-                    onChange={(e) => setPageNumber(e.target.value)}
-                    placeholder="请输入所在页码"
-                    required
-                  />
-                </div>
-                
-                <div>
                   <label htmlFor="comment" className="block text-sm font-medium text-ink-800 mb-3">
                     文献注释
                   </label>
@@ -457,16 +435,17 @@ export default function Home() {
                 </div>
                 
                 <div>
-                  <label htmlFor="imageUrl" className="block text-sm font-medium text-ink-800 mb-3">
-                    图片URL
+                  <label htmlFor="pageNumber" className="block text-sm font-medium text-ink-800 mb-3">
+                    所在页码 <span className="text-accent-gold">*</span>
                   </label>
                   <input
                     type="text"
-                    id="imageUrl"
+                    id="pageNumber"
                     className="input-field"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="用于异体字或无法打出的字（可选）"
+                    value={pageNumber}
+                    onChange={(e) => setPageNumber(e.target.value)}
+                    placeholder="请输入所在页码"
+                    required
                   />
                 </div>
                 

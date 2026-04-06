@@ -131,8 +131,7 @@ export default function AdminPage() {
         period: editedDocument.period,
         content: editedDocument.content,
         page_number: editedDocument.page_number,
-        comment: editedDocument.comment,
-        image_url: editedDocument.image_url
+        comment: editedDocument.comment
       })
       .eq('id', id)
 
@@ -167,7 +166,6 @@ export default function AdminPage() {
         content: editedDocument.content,
         page_number: editedDocument.page_number,
         comment: editedDocument.comment,
-        image_url: editedDocument.image_url,
         status: 'approved'
       })
       .eq('id', id)
@@ -504,20 +502,6 @@ export default function AdminPage() {
                       </div>
                       
                       <div>
-                        <label htmlFor="page_number" className="block text-sm font-medium text-ink-800 mb-3">
-                          所在页码
-                        </label>
-                        <input
-                          type="text"
-                          id="page_number"
-                          className="input-field"
-                          value={editedDocument?.page_number || ''}
-                          onChange={(e) => setEditedDocument({ ...editedDocument, page_number: e.target.value })}
-                          required
-                        />
-                      </div>
-                      
-                      <div>
                         <label htmlFor="comment" className="block text-sm font-medium text-ink-800 mb-3">
                           文献注释
                         </label>
@@ -530,16 +514,16 @@ export default function AdminPage() {
                       </div>
                       
                       <div>
-                        <label htmlFor="image_url" className="block text-sm font-medium text-ink-800 mb-3">
-                          图片URL
+                        <label htmlFor="page_number" className="block text-sm font-medium text-ink-800 mb-3">
+                          所在页码
                         </label>
                         <input
                           type="text"
-                          id="image_url"
+                          id="page_number"
                           className="input-field"
-                          value={editedDocument?.image_url || ''}
-                          onChange={(e) => setEditedDocument({ ...editedDocument, image_url: e.target.value })}
-                          placeholder="用于异体字或无法打出的字（可选）"
+                          value={editedDocument?.page_number || ''}
+                          onChange={(e) => setEditedDocument({ ...editedDocument, page_number: e.target.value })}
+                          required
                         />
                       </div>
                     </div>
@@ -593,11 +577,7 @@ export default function AdminPage() {
                             <span className="text-ink-700/50">注释：</span>{doc.comment}
                           </p>
                         )}
-                        {doc.image_url && (
-                          <div className="mt-4 pt-4 border-t border-paper-200">
-                            <img src={doc.image_url} alt="文献图片" className="max-w-full h-auto rounded-lg shadow-paper" />
-                          </div>
-                        )}
+
                       </div>
                       <p className="mt-5 pt-4 border-t border-paper-200 text-xs text-ink-700/40">
                         提交时间: {new Date(doc.created_at).toLocaleString('zh-CN')}
