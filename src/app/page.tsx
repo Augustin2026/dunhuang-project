@@ -34,7 +34,7 @@ export default function Home() {
   // 当防抖搜索词变化时触发搜索
   useEffect(() => {
     if (debouncedSearchTerm.trim()) {
-      handleSearch()
+      handleSearch(debouncedSearchTerm)
     }
   }, [debouncedSearchTerm])
   const [title, setTitle] = useState('')
@@ -69,30 +69,97 @@ export default function Home() {
     }))
   }
 
-  async function handleSearch() {
-    if (!searchTerm.trim()) return
+  async function handleSearch(event?: React.MouseEvent | string) {
+    // 检查是否是鼠标事件
+    if (event && typeof event === 'object' && 'preventDefault' in event) {
+      event.preventDefault()
+      // 从状态中获取搜索词
+      const query = searchTerm
+      console.log('开始搜索，搜索词:', query)
+      
+      // 检查 query 是否是字符串类型
+      if (typeof query !== 'string' || !query.trim()) {
+        console.log('搜索词为空或不是字符串，取消搜索')
+        return
+      }
 
-    setLoading(true)
-    setShowResults(true)
+      setLoading(true)
+      setShowResults(true)
+      console.log('设置加载状态为 true，显示结果为 true')
 
-    try {
-      const response = await fetch(`/api/search?q=${encodeURIComponent(searchTerm)}&page=1`)
-      const data = await response.json()
+      try {
+        const apiUrl = `/api/search?q=${encodeURIComponent(query)}&page=1`
+        console.log('发起 API 请求，URL:', apiUrl)
+        const response = await fetch(apiUrl)
+        console.log('API 响应状态:', response.status)
+        
+        const data = await response.json()
+        console.log('API 响应数据:', data)
 
-      if (data.error) {
-        console.error('搜索失败:', data.error)
+        if (data.error) {
+          console.error('搜索失败:', data.error)
+          setDocumentResults([])
+          setDictionaryResults([])
+          console.log('设置搜索结果为空数组')
+        } else {
+          console.log('搜索成功，文献结果数量:', data.documents?.length || 0)
+          console.log('搜索成功，词典结果数量:', data.dictionary?.length || 0)
+          setDocumentResults(data.documents || [])
+          setDictionaryResults(data.dictionary || [])
+        }
+      } catch (error) {
+        console.error('搜索失败:', error)
         setDocumentResults([])
         setDictionaryResults([])
-      } else {
-        setDocumentResults(data.documents)
-        setDictionaryResults(data.dictionary)
+        console.log('设置搜索结果为空数组')
+      } finally {
+        setLoading(false)
+        console.log('设置加载状态为 false')
       }
-    } catch (error) {
-      console.error('搜索失败:', error)
-      setDocumentResults([])
-      setDictionaryResults([])
-    } finally {
-      setLoading(false)
+    } else {
+      // 处理字符串参数
+      const query = typeof event === 'string' ? event : searchTerm
+      console.log('开始搜索，搜索词:', query)
+      
+      // 检查 query 是否是字符串类型
+      if (typeof query !== 'string' || !query.trim()) {
+        console.log('搜索词为空或不是字符串，取消搜索')
+        return
+      }
+
+      setLoading(true)
+      setShowResults(true)
+      console.log('设置加载状态为 true，显示结果为 true')
+
+      try {
+        const apiUrl = `/api/search?q=${encodeURIComponent(query)}&page=1`
+        console.log('发起 API 请求，URL:', apiUrl)
+        const response = await fetch(apiUrl)
+        console.log('API 响应状态:', response.status)
+        
+        const data = await response.json()
+        console.log('API 响应数据:', data)
+
+        if (data.error) {
+          console.error('搜索失败:', data.error)
+          setDocumentResults([])
+          setDictionaryResults([])
+          console.log('设置搜索结果为空数组')
+        } else {
+          console.log('搜索成功，文献结果数量:', data.documents?.length || 0)
+          console.log('搜索成功，词典结果数量:', data.dictionary?.length || 0)
+          setDocumentResults(data.documents || [])
+          setDictionaryResults(data.dictionary || [])
+        }
+      } catch (error) {
+        console.error('搜索失败:', error)
+        setDocumentResults([])
+        setDictionaryResults([])
+        console.log('设置搜索结果为空数组')
+      } finally {
+        setLoading(false)
+        console.log('设置加载状态为 false')
+      }
     }
   }
 

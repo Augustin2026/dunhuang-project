@@ -1,20 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 
-export const dynamic = 'force-dynamic'
+// 直接在 API 路由中初始化 Supabase 客户端，避免依赖外部文件
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+
+// 检查环境变量是否设置
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Supabase environment variables not set')
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams
-  const searchTerm = searchParams.get('q') || ''
-  const page = parseInt(searchParams.get('page') || '1')
-  const limit = 20
-  const offset = (page - 1) * limit
-
-  if (!searchTerm.trim()) {
-    return NextResponse.json({ documents: [], dictionary: [], total: 0 }, { status: 200 })
-  }
-
   try {
+    const { searchParams } = new URL(request.url)
+    const searchTerm = searchParams.get('q') || ''
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = 20
+    const offset = (page - 1) * limit
+
+    if (!searchTerm.trim()) {
+      return NextResponse.json({ documents: [], dictionary: [], total: 0 }, { status: 200 })
+    }
+
     // 搜索文献
     const { data: docs, error: docsError, count: docsCount } = await supabase
       .from('documents')
