@@ -52,8 +52,7 @@ export async function GET(request: NextRequest) {
         const { data: dict, error: dictError } = await supabase
           .from('dictionary')
           .select('*')
-          .ilike('word', `%${searchTerm}%`)
-          .or(`definition.ilike.%25${encodeURIComponent(searchTerm)}%25`)
+          .or(`word.ilike.%${searchTerm}%,definition.ilike.%${searchTerm}%`)
           .range(0, 19) // 词典也限制最多20条
 
         if (dictError) {
