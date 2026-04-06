@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 
     if (docsError) {
       console.error('搜索文献失败:', docsError)
-      return NextResponse.json({ error: '搜索文献失败' }, { status: 500 })
+      return NextResponse.json({ error: '搜索文献失败', details: docsError }, { status: 500 })
     }
 
     return NextResponse.json(
