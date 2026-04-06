@@ -84,16 +84,19 @@ export default function AdminPage() {
     setActionLoading(id)
 
     try {
-      const { error, data } = await supabase
-        .from('documents')
-        .update({ status: 'approved' })
-        .eq('id', id)
-        .select()
+      const response = await fetch('/api/admin/approve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id })
+      })
 
-      console.log('更新操作结果:', { error, data })
+      const result = await response.json()
+      console.log('API 响应结果:', result)
 
-      if (error) {
-        console.error('审核通过失败:', error)
+      if (!response.ok || result.error) {
+        console.error('审核通过失败:', result.error)
         alert('审核通过失败，请重试')
       } else {
         console.log('审核通过成功，ID:', id)
@@ -107,22 +110,35 @@ export default function AdminPage() {
     }
   }
 
-  async function handleReject(id: string) {
+  async function handleReject(id: any) {
+    console.log('开始审核拒绝文献，ID:', id, '类型:', typeof id)
     setActionLoading(id)
 
-    const { error } = await supabase
-      .from('documents')
-      .update({ status: 'rejected' })
-      .eq('id', id)
+    try {
+      const response = await fetch('/api/admin/reject', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id })
+      })
 
-    if (error) {
-      console.error('审核拒绝失败:', error)
+      const result = await response.json()
+      console.log('API 响应结果:', result)
+
+      if (!response.ok || result.error) {
+        console.error('审核拒绝失败:', result.error)
+        alert('审核拒绝失败，请重试')
+      } else {
+        console.log('审核拒绝成功，ID:', id)
+        setPendingDocuments(pendingDocuments.filter(doc => doc.id !== id))
+      }
+    } catch (error) {
+      console.error('审核拒绝过程中发生错误:', error)
       alert('审核拒绝失败，请重试')
-    } else {
-      setPendingDocuments(pendingDocuments.filter(doc => doc.id !== id))
+    } finally {
+      setActionLoading(null)
     }
-
-    setActionLoading(null)
   }
 
   function handleEdit(doc: any) {
@@ -164,32 +180,47 @@ export default function AdminPage() {
     setEditedDocument(null)
   }
 
-  async function handleEditAndApprove(id: string) {
+  async function handleEditAndApprove(id: any) {
+    console.log('开始编辑并通过文献，ID:', id, '类型:', typeof id)
     setActionLoading(id)
 
-    const { error } = await supabase
-      .from('documents')
-      .update({
-        title: editedDocument.title,
-        document_number: editedDocument.document_number,
-        period: editedDocument.period,
-        content: editedDocument.content,
-        page_number: editedDocument.page_number,
-        comment: editedDocument.comment,
-        status: 'approved'
+    try {
+      // 首先更新文献内容
+      const updateResponse = await fetch('/api/admin/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id,
+          title: editedDocument.title,
+          document_number: editedDocument.document_number,
+          period: editedDocument.period,
+          content: editedDocument.content,
+          page_number: editedDocument.page_number,
+          comment: editedDocument.comment,
+          status: 'approved'
+        })
       })
-      .eq('id', id)
 
-    if (error) {
-      console.error('编辑并通过失败:', error)
+      const updateResult = await updateResponse.json()
+      console.log('更新文献 API 响应结果:', updateResult)
+
+      if (!updateResponse.ok || updateResult.error) {
+        console.error('编辑并通过失败:', updateResult.error)
+        alert('编辑并通过失败，请重试')
+      } else {
+        console.log('编辑并通过成功，ID:', id)
+        setPendingDocuments(pendingDocuments.filter(doc => doc.id !== id))
+        setEditMode(null)
+        setEditedDocument(null)
+      }
+    } catch (error) {
+      console.error('编辑并通过过程中发生错误:', error)
       alert('编辑并通过失败，请重试')
-    } else {
-      setPendingDocuments(pendingDocuments.filter(doc => doc.id !== id))
-      setEditMode(null)
-      setEditedDocument(null)
+    } finally {
+      setActionLoading(null)
     }
-
-    setActionLoading(null)
   }
 
   async function handleChangePassword(e: React.FormEvent) {
