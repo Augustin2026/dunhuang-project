@@ -248,7 +248,7 @@ export default function AdminPage() {
         <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 py-4">
           <div className="flex justify-between items-center">
             <a href="/" className="text-ink-900 font-serif font-semibold text-lg">
-              敦煌文献检索
+              敦煌吐鲁番出土文献
             </a>
             <a
               href="/admin"

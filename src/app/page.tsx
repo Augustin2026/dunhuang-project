@@ -295,7 +295,7 @@ const Page = () => {
       <nav className="backdrop-blur-md bg-white/70 sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="text-2xl font-bold text-ink-900">
-            敦煌文献检索系统
+            敦煌吐鲁番出土文献
           </div>
           <div>
             <a href="/admin" className="text-ink-700 hover:text-ink-900 font-medium">
@@ -308,7 +308,7 @@ const Page = () => {
       {/* 大标题区域 */}
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-900 to-amber-600 mb-4">
-          敦煌文献检索系统
+          敦煌吐鲁番出土文献
         </h1>
         <p className="text-xl text-ink-700 mb-8">
           致力于敦煌吐鲁番文献的学术交流与共享
@@ -604,7 +604,7 @@ const Page = () => {
       <footer className="bg-stone-100 py-8">
         <div className="container mx-auto px-4 text-center">
           <p className="text-ink-700 mb-4">
-            © 2026 敦煌文献检索系统. 致力于敦煌吐鲁番文献的学术交流与共享。
+            © 2026 敦煌吐鲁番出土文献. 致力于敦煌吐鲁番文献的学术交流与共享。
           </p>
           <button className="text-amber-700 hover:text-amber-900 font-medium">
             版权与免责声明
