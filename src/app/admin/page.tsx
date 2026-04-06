@@ -79,15 +79,18 @@ export default function AdminPage() {
     fetchFeedbacks()
   }, [showFeedbacks])
 
-  async function handleApprove(id: string) {
-    console.log('开始审核通过文献，ID:', id)
+  async function handleApprove(id: any) {
+    console.log('开始审核通过文献，ID:', id, '类型:', typeof id)
     setActionLoading(id)
 
     try {
-      const { error } = await supabase
+      const { error, data } = await supabase
         .from('documents')
         .update({ status: 'approved' })
         .eq('id', id)
+        .select()
+
+      console.log('更新操作结果:', { error, data })
 
       if (error) {
         console.error('审核通过失败:', error)
