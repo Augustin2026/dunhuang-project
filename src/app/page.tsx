@@ -135,15 +135,26 @@ const Page = () => {
     fetch('/api/visits', {
       method: 'POST'
     })
+    .then(res => res.json())
+    .then(data => {
+      console.log('增加访问量响应:', data)
+    })
+    .catch(error => {
+      console.error('增加访问量失败:', error)
+    })
 
     // 获取访问量
     fetch('/api/visits')
       .then(res => res.json())
       .then(data => {
+        console.log('获取访问量响应:', data)
         setVisits({
           today: data.today || 0,
           total: data.total || 0
         })
+      })
+      .catch(error => {
+        console.error('获取访问量失败:', error)
       })
   }, [])
 
