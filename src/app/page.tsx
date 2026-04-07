@@ -783,11 +783,17 @@ const Page = () => {
                 </button>
               </div>
               <div className="relative">
-                <img
-                  src={`https://hpggnkatybvyqepogdcb.supabase.co/storage/v1/object/public/dictionary-pages/TuCi_${currentImagePage}.png`}
-                  alt={`词典第 ${currentImagePage} 页`}
-                  className="w-full h-auto max-h-[70vh] object-contain"
-                />
+                {(() => {
+                  const imageUrl = `https://hpggnkatybvyqepogdcb.supabase.co/storage/v1/object/public/dictionary-pages/TuCi_${currentImagePage}.png`
+                  return (
+                    <img
+                      key={imageUrl}
+                      src={imageUrl}
+                      alt={`词典第 ${currentImagePage} 页`}
+                      className="w-full h-auto max-h-[70vh] object-contain"
+                    />
+                  )
+                })()}
               </div>
             </div>
           </div>
