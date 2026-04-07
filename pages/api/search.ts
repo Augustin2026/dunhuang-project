@@ -1,63 +1,56 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createClient } from '@supabase/supabase-js'
+import * as OpenCC from 'opencc-js'
+
+// 初始化简繁转换实例
+const converterS2T = OpenCC.Converter({ from: 'cn', to: 'tw' })
+const converterT2S = OpenCC.Converter({ from: 'tw', to: 'cn' })
 
 // 繁简转换函数
 function convertToTraditional(text: string): string {
-  // 这里使用一个简单的繁简转换映射
-  // 实际应用中可以使用更完整的转换库
-  const simplifiedToTraditional: Record<string, string> = {
-    '高': '高',
-    '昌': '昌',
-    '经': '經',
-    '书': '書',
-    '文': '文',
-    '字': '字',
-    '词': '詞',
-    '条': '條',
-    '件': '件',
-    '搜': '搜',
-    '索': '索',
-    '结': '結',
-    '果': '果',
-    '显': '顯',
-    '示': '示',
-    '文': '文',
-    '献': '獻',
-    '注': '注',
-    '释': '釋',
-    '时': '時',
-    '代': '代',
-    '页': '頁',
-    '码': '碼'
-    // 可以添加更多的繁简转换映射
+  try {
+    return converterS2T(text)
+  } catch (error) {
+    console.error('简转繁失败:', error)
+    return text
   }
-  
-  return text.split('').map(char => simplifiedToTraditional[char] || char).join('')
+}
+
+// 繁转简函数
+function convertToSimplified(text: string): string {
+  try {
+    return converterT2S(text)
+  } catch (error) {
+    console.error('繁转简失败:', error)
+    return text
+  }
 }
 
 // 生成包含简体和繁体的搜索条件
-  function generateSearchConditions(searchTerm: string, searchType: string): string {
-    const traditionalTerm = convertToTraditional(searchTerm)
-    
-    // 根据搜索类型生成不同的搜索条件
-    switch (searchType) {
-      case 'title':
-        if (searchTerm === traditionalTerm) {
-          return `title.ilike.%${searchTerm}%`
-        }
-        return `title.ilike.%${searchTerm}%,title.ilike.%${traditionalTerm}%`
-      case 'content':
-        if (searchTerm === traditionalTerm) {
-          return `content.ilike.%${searchTerm}%`
-        }
-        return `content.ilike.%${searchTerm}%,content.ilike.%${traditionalTerm}%`
-      default: // global
-        if (searchTerm === traditionalTerm) {
-          return `title.ilike.%${searchTerm}%,document_number.ilike.%${searchTerm}%,period.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%,comment.ilike.%${searchTerm}%`
-        }
-        return `title.ilike.%${searchTerm}%,title.ilike.%${traditionalTerm}%,document_number.ilike.%${searchTerm}%,document_number.ilike.%${traditionalTerm}%,period.ilike.%${searchTerm}%,period.ilike.%${traditionalTerm}%,content.ilike.%${searchTerm}%,content.ilike.%${traditionalTerm}%,comment.ilike.%${searchTerm}%,comment.ilike.%${traditionalTerm}%`
-    }
+function generateSearchConditions(searchTerm: string, searchType: string): string {
+  // 将搜索词转换为简体和繁体
+  const simpTerm = convertToSimplified(searchTerm)
+  const tradTerm = convertToTraditional(searchTerm)
+  
+  // 根据搜索类型生成不同的搜索条件
+  switch (searchType) {
+    case 'title':
+      if (simpTerm === tradTerm) {
+        return `title.ilike.%${simpTerm}%`
+      }
+      return `title.ilike.%${simpTerm}%,title.ilike.%${tradTerm}%`
+    case 'content':
+      if (simpTerm === tradTerm) {
+        return `content.ilike.%${simpTerm}%`
+      }
+      return `content.ilike.%${simpTerm}%,content.ilike.%${tradTerm}%`
+    default: // global
+      if (simpTerm === tradTerm) {
+        return `title.ilike.%${simpTerm}%,document_number.ilike.%${simpTerm}%,period.ilike.%${simpTerm}%,content.ilike.%${simpTerm}%,comment.ilike.%${simpTerm}%`
+      }
+      return `title.ilike.%${simpTerm}%,title.ilike.%${tradTerm}%,document_number.ilike.%${simpTerm}%,document_number.ilike.%${tradTerm}%,period.ilike.%${simpTerm}%,period.ilike.%${tradTerm}%,content.ilike.%${simpTerm}%,content.ilike.%${tradTerm}%,comment.ilike.%${simpTerm}%,comment.ilike.%${tradTerm}%`
   }
+}
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
@@ -103,10 +96,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     let dictionaryResults = []
     try {
-      const traditionalTerm = convertToTraditional(searchTerm)
-      const dictSearchConditions = searchTerm === traditionalTerm 
-        ? `word.ilike.%${searchTerm}%,definition.ilike.%${searchTerm}%`
-        : `word.ilike.%${searchTerm}%,word.ilike.%${traditionalTerm}%,definition.ilike.%${searchTerm}%,definition.ilike.%${traditionalTerm}%`
+      // 将搜索词转换为简体和繁体
+      const simpTerm = convertToSimplified(searchTerm)
+      const tradTerm = convertToTraditional(searchTerm)
+      
+      const dictSearchConditions = simpTerm === tradTerm 
+        ? `word.ilike.%${simpTerm}%,definition.ilike.%${simpTerm}%`
+        : `word.ilike.%${simpTerm}%,word.ilike.%${tradTerm}%,definition.ilike.%${simpTerm}%,definition.ilike.%${tradTerm}%`
       
       const { data: dict, error: dictError } = await supabase
         .from('dictionary')
