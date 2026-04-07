@@ -753,26 +753,11 @@ const Page = () => {
                 </button>
               </div>
               <div className="relative">
-                {(() => {
-                  // 计算实际的图片页码（这里假设偏移量为 0，根据实际情况调整）
-                  const offset = 0
-                  const imagePageNumber = currentImagePage + offset
-                  
-                  // 构建图片 URL
-                  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ulzivnxfvofzlbczqgnb.supabase.co'
-                  const imageUrl = `${supabaseUrl}/storage/v1/object/public/dictionary-pages/TuCi_${imagePageNumber}.png`
-                  
-                  // 输出调试日志
-                  console.log('Image URL:', imageUrl)
-                  
-                  return (
-                    <img
-                      src={imageUrl}
-                      alt={`词典第 ${currentImagePage} 页`}
-                      className="w-full h-auto max-h-[70vh] object-contain"
-                    />
-                  )
-                })()}
+                <img
+                  src={`https://hpggnkatybvyqepogdcb.supabase.co/storage/v1/object/public/dictionary-pages/TuCi_${currentImagePage}.png`}
+                  alt={`词典第 ${currentImagePage} 页`}
+                  className="w-full h-auto max-h-[70vh] object-contain"
+                />
               </div>
             </div>
           </div>
