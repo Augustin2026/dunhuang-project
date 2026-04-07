@@ -23,6 +23,7 @@ const Page = () => {
   const [searchType, setSearchType] = useState('global') // global, title, content, dictionary
   const [showImageViewer, setShowImageViewer] = useState(false)
   const [currentImagePage, setCurrentImagePage] = useState(1)
+  const [isLoading, setIsLoading] = useState(true)
   const [imageUrl, setImageUrl] = useState('')
   const [showMoreDocuments, setShowMoreDocuments] = useState(false)
   const [showMoreDictionary, setShowMoreDictionary] = useState(false)
@@ -37,11 +38,12 @@ const Page = () => {
     return () => clearTimeout(timer)
   }, [searchTerm])
 
-  // 当页码变化且弹窗打开时，更新图片 URL
+  // 当页码变化且弹窗打开时，更新图片 URL 并设置加载状态为 true
   useEffect(() => {
     if (showImageViewer) {
       const newImageUrl = `https://hpggnkatybvyqepogdcb.supabase.co/storage/v1/object/public/dictionary-pages/TuCi_${currentImagePage}.jpeg`
       setImageUrl(newImageUrl)
+      setIsLoading(true)
     }
   }, [currentImagePage, showImageViewer])
 
@@ -791,13 +793,20 @@ const Page = () => {
                   后一页
                 </button>
               </div>
-              <div className="relative">
+              <div className="relative min-h-[200px]">
                 {imageUrl && (
                   <img
                     src={imageUrl}
                     alt={`词典第 ${currentImagePage} 页`}
                     className="w-full h-auto max-h-[70vh] object-contain"
+                    onLoad={() => setIsLoading(false)}
                   />
+                )}
+                {isLoading && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center -z-10 text-stone-500">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-700 mb-4"></div>
+                    <p>加载中...</p>
+                  </div>
                 )}
               </div>
             </div>
