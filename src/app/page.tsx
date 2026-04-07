@@ -429,7 +429,7 @@ const Page = () => {
                         {doc.comment && (
                           <div className="mb-4">
                             <h5 className="text-sm font-semibold text-ink-700 mb-1">文献注释:</h5>
-                            <p className="text-gray-600 text-sm">{highlightText(doc.comment, searchTerm)}</p>
+                            <p className="text-gray-600 text-sm whitespace-pre-wrap">{highlightText(doc.comment, searchTerm)}</p>
                           </div>
                         )}
                         {doc.page_number && (
