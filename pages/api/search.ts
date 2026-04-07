@@ -51,16 +51,6 @@ function convertToTraditional(text: string): string {
           return `content.ilike.%${searchTerm}%`
         }
         return `content.ilike.%${searchTerm}%,content.ilike.%${traditionalTerm}%`
-      case 'comment':
-        if (searchTerm === traditionalTerm) {
-          return `comment.ilike.%${searchTerm}%`
-        }
-        return `comment.ilike.%${searchTerm}%,comment.ilike.%${traditionalTerm}%`
-      case 'document_number':
-        if (searchTerm === traditionalTerm) {
-          return `document_number.ilike.%${searchTerm}%`
-        }
-        return `document_number.ilike.%${searchTerm}%,document_number.ilike.%${traditionalTerm}%`
       default: // global
         if (searchTerm === traditionalTerm) {
           return `title.ilike.%${searchTerm}%,document_number.ilike.%${searchTerm}%,period.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%,comment.ilike.%${searchTerm}%`

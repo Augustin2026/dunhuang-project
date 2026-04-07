@@ -15,7 +15,8 @@ const Page = () => {
   const [documentResults, setDocumentResults] = useState<any[]>([])
   const [dictionaryResults, setDictionaryResults] = useState<any[]>([])
   const [showResults, setShowResults] = useState(false)
-  const [searchType, setSearchType] = useState('global') // global, title, content, comment, document_number
+  const [searchType, setSearchType] = useState('global') // global, title, content
+  const [visits, setVisits] = useState({ today: 0, total: 0 })
 
   // 防抖处理
   useEffect(() => {
@@ -127,6 +128,24 @@ const Page = () => {
       memoizedHandleSearch(debouncedSearchTerm)
     }
   }, [debouncedSearchTerm, memoizedHandleSearch])
+
+  // 页面加载时增加访问量并获取当前访问量
+  useEffect(() => {
+    // 增加访问量
+    fetch('/api/visits', {
+      method: 'POST'
+    })
+
+    // 获取访问量
+    fetch('/api/visits')
+      .then(res => res.json())
+      .then(data => {
+        setVisits({
+          today: data.today || 0,
+          total: data.total || 0
+        })
+      })
+  }, [])
 
   const [title, setTitle] = useState('')
   const [documentNumber, setDocumentNumber] = useState('')
@@ -345,18 +364,6 @@ const Page = () => {
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${searchType === 'content' ? 'bg-ink-800 text-white shadow-md' : 'bg-gray-100 text-ink-700 hover:bg-gray-200'}`}
             >
               内容搜索
-            </button>
-            <button
-              onClick={() => setSearchType('comment')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${searchType === 'comment' ? 'bg-ink-800 text-white shadow-md' : 'bg-gray-100 text-ink-700 hover:bg-gray-200'}`}
-            >
-              注释搜索
-            </button>
-            <button
-              onClick={() => setSearchType('document_number')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${searchType === 'document_number' ? 'bg-ink-800 text-white shadow-md' : 'bg-gray-100 text-ink-700 hover:bg-gray-200'}`}
-            >
-              文书号搜索
             </button>
           </div>
         </div>
@@ -646,6 +653,14 @@ const Page = () => {
           </button>
         </div>
       </footer>
+
+      {/* 访问量统计 */}
+      <div className="fixed bottom-4 right-4 bg-white rounded-lg shadow-md p-3 text-sm text-ink-700">
+        <div className="flex flex-col items-end">
+          <div>今日访问量: {visits.today}</div>
+          <div>总访问量: {visits.total}</div>
+        </div>
+      </div>
 
       {/* 版权与免责声明模态框 */}
       {showCopyrightModal && (
