@@ -38,12 +38,14 @@ const Page = () => {
     return () => clearTimeout(timer)
   }, [searchTerm])
 
-  // 当页码变化时，更新图片 URL 并设置加载状态为 true
+  // 当页码变化且弹窗打开时，更新图片 URL 并设置加载状态为 true
   useEffect(() => {
-    const newImageUrl = `https://hpggnkatybvyqepogdcb.supabase.co/storage/v1/object/public/dictionary-pages/TuCi_${currentImagePage}.jpeg`
-    setImageUrl(newImageUrl)
-    setIsLoading(true)
-  }, [currentImagePage])
+    if (showImageViewer) {
+      const newImageUrl = `https://hpggnkatybvyqepogdcb.supabase.co/storage/v1/object/public/dictionary-pages/TuCi_${currentImagePage}.jpeg`
+      setImageUrl(newImageUrl)
+      setIsLoading(true)
+    }
+  }, [currentImagePage, showImageViewer])
 
   // 使用 useCallback 来 memoize 搜索函数
   const memoizedHandleSearch = useCallback(async (event?: React.MouseEvent | string) => {
