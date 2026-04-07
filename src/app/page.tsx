@@ -23,7 +23,6 @@ const Page = () => {
   const [searchType, setSearchType] = useState('global') // global, title, content, dictionary
   const [showImageViewer, setShowImageViewer] = useState(false)
   const [currentImagePage, setCurrentImagePage] = useState(1)
-  const [isLoading, setIsLoading] = useState(true)
   const [imageUrl, setImageUrl] = useState('')
   const [showMoreDocuments, setShowMoreDocuments] = useState(false)
   const [showMoreDictionary, setShowMoreDictionary] = useState(false)
@@ -38,12 +37,11 @@ const Page = () => {
     return () => clearTimeout(timer)
   }, [searchTerm])
 
-  // 当页码变化且弹窗打开时，更新图片 URL 并设置加载状态为 true
+  // 当页码变化且弹窗打开时，更新图片 URL
   useEffect(() => {
     if (showImageViewer) {
       const newImageUrl = `https://hpggnkatybvyqepogdcb.supabase.co/storage/v1/object/public/dictionary-pages/TuCi_${currentImagePage}.jpeg`
       setImageUrl(newImageUrl)
-      setIsLoading(true)
     }
   }, [currentImagePage, showImageViewer])
 
@@ -798,21 +796,8 @@ const Page = () => {
                   <img
                     src={imageUrl}
                     alt={`词典第 ${currentImagePage} 页`}
-                    className={`w-full h-auto max-h-[70vh] object-contain transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}
-                    onLoad={() => setIsLoading(false)}
-                    onError={() => {
-                      setIsLoading(false)
-                      console.error(`图片加载失败: ${imageUrl}`)
-                    }}
+                    className="w-full h-auto max-h-[70vh] object-contain"
                   />
-                )}
-                {isLoading && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-lg">
-                    <div className="flex flex-col items-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-700 mb-4"></div>
-                      <p className="text-ink-800">原典加载中...</p>
-                    </div>
-                  </div>
                 )}
               </div>
             </div>
