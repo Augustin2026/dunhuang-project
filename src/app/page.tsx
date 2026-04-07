@@ -17,6 +17,8 @@ const Page = () => {
   const [showResults, setShowResults] = useState(false)
   const [searchType, setSearchType] = useState('global') // global, title, content
   const [visits, setVisits] = useState({ today: 0, total: 0 })
+  const [showImageViewer, setShowImageViewer] = useState(false)
+  const [currentImagePage, setCurrentImagePage] = useState(1)
 
   // 防抖处理
   useEffect(() => {
@@ -476,9 +478,20 @@ const Page = () => {
                         <h4 className="text-xl font-bold text-ink-900 mb-2">
                           {highlightText(dict.word, searchTerm)}
                         </h4>
-                        <p className="text-gray-600 line-clamp-3">
+                        <p className="text-gray-600 line-clamp-3 mb-4">
                           {highlightText(dict.definition, searchTerm)}
                         </p>
+                        <div className="flex justify-end">
+                          <button
+                            onClick={() => {
+                              setCurrentImagePage(dict.page || 1)
+                              setShowImageViewer(true)
+                            }}
+                            className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-lg transition-all duration-300"
+                          >
+                            查看原典
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -703,6 +716,49 @@ const Page = () => {
               >
                 关闭
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 图片浏览器 */}
+      {showImageViewer && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="relative max-w-4xl w-full max-h-[90vh]">
+            <div className="bg-white rounded-xl shadow-lg p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold text-ink-900">原典浏览</h3>
+                <button
+                  onClick={() => setShowImageViewer(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex items-center justify-center mb-4">
+                <button
+                  onClick={() => setCurrentImagePage(prev => Math.max(1, prev - 1))}
+                  className="px-4 py-2 bg-ink-800 text-white rounded-lg hover:bg-ink-900 transition-all duration-300 mr-4"
+                >
+                  前一页
+                </button>
+                <span className="text-ink-700 font-medium">第 {currentImagePage} 页</span>
+                <button
+                  onClick={() => setCurrentImagePage(prev => prev + 1)}
+                  className="px-4 py-2 bg-ink-800 text-white rounded-lg hover:bg-ink-900 transition-all duration-300 ml-4"
+                >
+                  后一页
+                </button>
+              </div>
+              <div className="relative">
+                <img
+                  src={`https://ulzivnxfvofzlbczqgnb.supabase.co/storage/v1/object/public/dictionary-pages/TuCi_${currentImagePage}.png`}
+                  alt={`词典第 ${currentImagePage} 页`}
+                  className="w-full h-auto max-h-[70vh] object-contain"
+                />
+              </div>
             </div>
           </div>
         </div>

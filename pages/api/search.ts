@@ -101,12 +101,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const tradTerm = convertToTraditional(searchTerm)
       
       const dictSearchConditions = simpTerm === tradTerm 
-        ? `word.ilike.%${simpTerm}%,definition.ilike.%${simpTerm}%`
-        : `word.ilike.%${simpTerm}%,word.ilike.%${tradTerm}%,definition.ilike.%${simpTerm}%,definition.ilike.%${tradTerm}%`
+        ? `word.ilike.%${simpTerm}%`
+        : `word.ilike.%${simpTerm}%,word.ilike.%${tradTerm}%`
       
       const { data: dict, error: dictError } = await supabase
         .from('dictionary')
-        .select('*')
+        .select('id, word, page')
         .or(dictSearchConditions)
         .range(0, 19)
 
@@ -114,7 +114,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.error('搜索词典失败:', dictError)
         dictionaryResults = []
       } else {
-        dictionaryResults = dict || []
+        // 为每个词典条目添加 definition 字段，以便前端显示
+        dictionaryResults = (dict || []).map(item => ({
+          ...item,
+          definition: `位于第 ${item.page} 页`
+        }))
       }
     } catch (error) {
       console.error('搜索词典失败:', error)
