@@ -24,6 +24,7 @@ const Page = () => {
   const [showImageViewer, setShowImageViewer] = useState(false)
   const [currentImagePage, setCurrentImagePage] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
+  const [imageUrl, setImageUrl] = useState('')
   const [showMoreDocuments, setShowMoreDocuments] = useState(false)
   const [showMoreDictionary, setShowMoreDictionary] = useState(false)
   const [resultsPerPage, setResultsPerPage] = useState(10)
@@ -37,8 +38,10 @@ const Page = () => {
     return () => clearTimeout(timer)
   }, [searchTerm])
 
-  // 当页码变化时，设置加载状态为 true
+  // 当页码变化时，更新图片 URL 并设置加载状态为 true
   useEffect(() => {
+    const newImageUrl = `https://hpggnkatybvyqepogdcb.supabase.co/storage/v1/object/public/dictionary-pages/TuCi_${currentImagePage}.png`
+    setImageUrl(newImageUrl)
     setIsLoading(true)
   }, [currentImagePage])
 
@@ -789,12 +792,18 @@ const Page = () => {
                 </button>
               </div>
               <div className="relative">
-                <img
-                  src={`https://hpggnkatybvyqepogdcb.supabase.co/storage/v1/object/public/dictionary-pages/TuCi_${currentImagePage}.png`}
-                  alt={`词典第 ${currentImagePage} 页`}
-                  className={`w-full h-auto max-h-[70vh] object-contain transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}
-                  onLoad={() => setIsLoading(false)}
-                />
+                {imageUrl && (
+                  <img
+                    src={imageUrl}
+                    alt={`词典第 ${currentImagePage} 页`}
+                    className={`w-full h-auto max-h-[70vh] object-contain transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}
+                    onLoad={() => setIsLoading(false)}
+                    onError={() => {
+                      setIsLoading(false)
+                      console.error(`图片加载失败: ${imageUrl}`)
+                    }}
+                  />
+                )}
                 {isLoading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-lg">
                     <div className="flex flex-col items-center">
