@@ -21,7 +21,6 @@ const Page = () => {
   const [dictionaryResults, setDictionaryResults] = useState<any[]>([])
   const [showResults, setShowResults] = useState(false)
   const [searchType, setSearchType] = useState('global') // global, title, content, dictionary
-  const [visits, setVisits] = useState({ today: 0, total: 0 })
   const [showImageViewer, setShowImageViewer] = useState(false)
   const [currentImagePage, setCurrentImagePage] = useState(1)
   const [showMoreDocuments, setShowMoreDocuments] = useState(false)
@@ -143,34 +142,7 @@ const Page = () => {
     }
   }, [debouncedSearchTerm, memoizedHandleSearch])
 
-  // 页面加载时增加访问量并获取当前访问量
-  useEffect(() => {
-    // 增加访问量
-    fetch('/api/visits', {
-      method: 'POST'
-    })
-    .then(res => res.json())
-    .then(data => {
-      console.log('增加访问量响应:', data)
-    })
-    .catch(error => {
-      console.error('增加访问量失败:', error)
-    })
 
-    // 获取访问量
-    fetch('/api/visits')
-      .then(res => res.json())
-      .then(data => {
-        console.log('获取访问量响应:', data)
-        setVisits({
-          today: data.today || 0,
-          total: data.total || 0
-        })
-      })
-      .catch(error => {
-        console.error('获取访问量失败:', error)
-      })
-  }, [])
 
   const [title, setTitle] = useState('')
   const [documentNumber, setDocumentNumber] = useState('')
@@ -742,13 +714,7 @@ const Page = () => {
         </div>
       </footer>
 
-      {/* 访问量统计 */}
-      <div className="fixed bottom-4 right-4 bg-white rounded-lg shadow-md p-3 text-sm text-ink-700">
-        <div className="flex flex-col items-end">
-          <div>今日访问量: {visits.today}</div>
-          <div>总访问量: {visits.total}</div>
-        </div>
-      </div>
+
 
       {/* 版权与免责声明模态框 */}
       {showCopyrightModal && (
