@@ -94,7 +94,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return
     }
 
-    let dictionaryResults = []
+    let dictionaryResults: { id: string; word: string; page: number; definition: string }[] = []
     try {
       // 将搜索词转换为简体和繁体
       const simpTerm = convertToSimplified(searchTerm)
