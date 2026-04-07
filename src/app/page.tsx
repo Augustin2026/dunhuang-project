@@ -24,6 +24,9 @@ const Page = () => {
   const [visits, setVisits] = useState({ today: 0, total: 0 })
   const [showImageViewer, setShowImageViewer] = useState(false)
   const [currentImagePage, setCurrentImagePage] = useState(1)
+  const [showMoreDocuments, setShowMoreDocuments] = useState(false)
+  const [showMoreDictionary, setShowMoreDictionary] = useState(false)
+  const [resultsPerPage, setResultsPerPage] = useState(10)
 
   // 防抖处理
   useEffect(() => {
@@ -51,7 +54,9 @@ const Page = () => {
 
           setLoading(true)
           setShowResults(true)
-          console.log('设置加载状态为 true，显示结果为 true')
+          setShowMoreDocuments(false)
+          setShowMoreDictionary(false)
+          console.log('设置加载状态为 true，显示结果为 true，重置显示更多状态')
 
           try {
             const apiUrl = `/api/search?q=${encodeURIComponent(query)}&page=1&type=${searchType}`
@@ -95,7 +100,9 @@ const Page = () => {
 
           setLoading(true)
           setShowResults(true)
-          console.log('设置加载状态为 true，显示结果为 true')
+          setShowMoreDocuments(false)
+          setShowMoreDictionary(false)
+          console.log('设置加载状态为 true，显示结果为 true，重置显示更多状态')
 
           try {
             const apiUrl = `/api/search?q=${encodeURIComponent(query)}&page=1&type=${searchType}`
@@ -439,12 +446,52 @@ const Page = () => {
             </div>
           ) : documentResults.length > 0 || dictionaryResults.length > 0 ? (
             <div className="space-y-6">
+              {/* 词典结果 */}
+              {dictionaryResults.length > 0 && (
+                <div>
+                  <h3 className="text-xl font-bold mb-4 text-ink-800">词典 ({dictionaryResults.length}条)</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {(showMoreDictionary ? dictionaryResults : dictionaryResults.slice(0, resultsPerPage)).map((dict) => (
+                      <div key={dict.id} className="bg-white rounded-xl shadow-sm p-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                        <h4 className="text-lg font-bold text-ink-900 mb-2">
+                          {highlightText(dict.word, searchTerm)}
+                        </h4>
+                        <p className="text-gray-600 line-clamp-2 mb-3 text-sm">
+                          {highlightText(dict.definition, searchTerm)}
+                        </p>
+                        <div className="flex justify-end">
+                          <button
+                            onClick={() => {
+                              setCurrentImagePage(dict.page || 1)
+                              setShowImageViewer(true)
+                            }}
+                            className="px-3 py-1.5 bg-amber-700 hover:bg-amber-800 text-white rounded-lg transition-all duration-300 text-sm"
+                          >
+                            查看原典
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {dictionaryResults.length > resultsPerPage && !showMoreDictionary && (
+                    <div className="mt-4 text-center">
+                      <button
+                        onClick={() => setShowMoreDictionary(true)}
+                        className="px-4 py-2 bg-ink-800 hover:bg-ink-900 text-white rounded-lg transition-all duration-300"
+                      >
+                        查看更多
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* 文献结果 */}
               {documentResults.length > 0 && (
                 <div>
-                  <h3 className="text-xl font-bold mb-4 text-ink-800">文献</h3>
+                  <h3 className="text-xl font-bold mb-4 text-ink-800">文献 ({documentResults.length}条)</h3>
                   <div className="space-y-4">
-                    {documentResults.map((doc) => (
+                    {(showMoreDocuments ? documentResults : documentResults.slice(0, resultsPerPage)).map((doc) => (
                       <div key={doc.id} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                         <div className="flex justify-between items-start mb-4">
                           <h4 className="text-xl font-bold text-ink-900">
@@ -502,36 +549,16 @@ const Page = () => {
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
-
-              {/* 词典结果 */}
-              {dictionaryResults.length > 0 && (
-                <div>
-                  <h3 className="text-xl font-bold mb-4 text-ink-800">词典</h3>
-                  <div className="space-y-4">
-                    {dictionaryResults.map((dict) => (
-                      <div key={dict.id} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                        <h4 className="text-xl font-bold text-ink-900 mb-2">
-                          {highlightText(dict.word, searchTerm)}
-                        </h4>
-                        <p className="text-gray-600 line-clamp-3 mb-4">
-                          {highlightText(dict.definition, searchTerm)}
-                        </p>
-                        <div className="flex justify-end">
-                          <button
-                            onClick={() => {
-                              setCurrentImagePage(dict.page || 1)
-                              setShowImageViewer(true)
-                            }}
-                            className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-lg transition-all duration-300"
-                          >
-                            查看原典
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  {documentResults.length > resultsPerPage && !showMoreDocuments && (
+                    <div className="mt-4 text-center">
+                      <button
+                        onClick={() => setShowMoreDocuments(true)}
+                        className="px-4 py-2 bg-ink-800 hover:bg-ink-900 text-white rounded-lg transition-all duration-300"
+                      >
+                        查看更多
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
