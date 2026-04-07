@@ -4,9 +4,14 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import dynamic from 'next/dynamic'
 import { Search, BookOpen } from 'lucide-react'
+import * as OpenCC from 'opencc-js'
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 import 'react-quill/dist/quill.snow.css'
+
+// 初始化简繁转换实例
+const converterS2T = OpenCC.Converter({ from: 'cn', to: 'tw' })
+const converterT2S = OpenCC.Converter({ from: 'tw', to: 'cn' })
 
 const Page = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -15,7 +20,7 @@ const Page = () => {
   const [documentResults, setDocumentResults] = useState<any[]>([])
   const [dictionaryResults, setDictionaryResults] = useState<any[]>([])
   const [showResults, setShowResults] = useState(false)
-  const [searchType, setSearchType] = useState('global') // global, title, content
+  const [searchType, setSearchType] = useState('global') // global, title, content, dictionary
   const [visits, setVisits] = useState({ today: 0, total: 0 })
   const [showImageViewer, setShowImageViewer] = useState(false)
   const [currentImagePage, setCurrentImagePage] = useState(1)
@@ -287,32 +292,58 @@ const Page = () => {
   const highlightText = (text: string, keyword: string): React.ReactNode => {
     if (!keyword) return text
 
-    const regex = new RegExp(`(${keyword})`, 'gi')
-    const parts = text.split(regex)
+    try {
+      // 将搜索词转换为简体和繁体
+      const simpTerm = converterT2S(keyword)
+      const tradTerm = converterS2T(keyword)
+      
+      // 构建包含简体和繁体的正则表达式
+      const terms = [simpTerm, tradTerm].filter((term, index, self) => self.indexOf(term) === index) // 去重
+      const regexPattern = `(${terms.join('|')})`
+      const regex = new RegExp(regexPattern, 'gi')
+      
+      const parts = text.split(regex)
 
-    return (
-      <>
-        {parts.map((part, index) =>
-          regex.test(part) ? (
-            <span key={index} className="bg-yellow-200/50 font-semibold">
-              {part}
-            </span>
-          ) : (
-            part
-          )
-        )}
-      </>
-    )
+      return (
+        <>
+          {parts.map((part, index) =>
+            regex.test(part) ? (
+              <span key={index} className="bg-yellow-200/50 font-semibold">
+                {part}
+              </span>
+            ) : (
+              part
+            )
+          )}
+        </>
+      )
+    } catch (error) {
+      console.error('高亮处理失败:', error)
+      return text
+    }
   }
 
   // 高亮显示HTML内容中的关键词
   const highlightHTML = (html: string, keyword: string): React.ReactNode => {
     if (!keyword) return <div dangerouslySetInnerHTML={{ __html: html }} />
 
-    const regex = new RegExp(`(${keyword})`, 'gi')
-    const highlightedHTML = html.replace(regex, '<span class="bg-yellow-200/50 font-semibold">$1</span>')
+    try {
+      // 将搜索词转换为简体和繁体
+      const simpTerm = converterT2S(keyword)
+      const tradTerm = converterS2T(keyword)
+      
+      // 构建包含简体和繁体的正则表达式
+      const terms = [simpTerm, tradTerm].filter((term, index, self) => self.indexOf(term) === index) // 去重
+      const regexPattern = `(${terms.join('|')})`
+      const regex = new RegExp(regexPattern, 'gi')
+      
+      const highlightedHTML = html.replace(regex, '<span class="bg-yellow-200/50 font-semibold">$1</span>')
 
-    return <div dangerouslySetInnerHTML={{ __html: highlightedHTML }} />
+      return <div dangerouslySetInnerHTML={{ __html: highlightedHTML }} />
+    } catch (error) {
+      console.error('HTML高亮处理失败:', error)
+      return <div dangerouslySetInnerHTML={{ __html: html }} />
+    }
   }
 
   // 文献展开/收起状态管理
@@ -377,6 +408,12 @@ const Page = () => {
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${searchType === 'content' ? 'bg-ink-800 text-white shadow-md' : 'bg-gray-100 text-ink-700 hover:bg-gray-200'}`}
             >
               内容搜索
+            </button>
+            <button
+              onClick={() => setSearchType('dictionary')}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${searchType === 'dictionary' ? 'bg-ink-800 text-white shadow-md' : 'bg-gray-100 text-ink-700 hover:bg-gray-200'}`}
+            >
+              词典搜索
             </button>
           </div>
         </div>

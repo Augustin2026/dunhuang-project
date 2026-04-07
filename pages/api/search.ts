@@ -44,6 +44,12 @@ function generateSearchConditions(searchTerm: string, searchType: string): strin
         return `content.ilike.%${simpTerm}%`
       }
       return `content.ilike.%${simpTerm}%,content.ilike.%${tradTerm}%`
+    case 'dictionary':
+      // 词典搜索只搜索 word 字段
+      if (simpTerm === tradTerm) {
+        return `word.ilike.%${simpTerm}%`
+      }
+      return `word.ilike.%${simpTerm}%,word.ilike.%${tradTerm}%`
     default: // global
       if (simpTerm === tradTerm) {
         return `title.ilike.%${simpTerm}%,document_number.ilike.%${simpTerm}%,period.ilike.%${simpTerm}%,content.ilike.%${simpTerm}%,comment.ilike.%${simpTerm}%`
@@ -79,19 +85,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return
     }
 
-    const searchConditions = generateSearchConditions(searchTerm, searchType)
+    let docs = []
+    let docsCount = 0
     
-    const { data: docs, error: docsError, count: docsCount } = await supabase
-      .from('documents')
-      .select('*', { count: 'exact' })
-      .eq('status', 'approved')
-      .or(searchConditions)
-      .range(offset, offset + limit - 1)
+    // 只有当搜索类型不是词典搜索时，才搜索文献
+    if (searchType !== 'dictionary') {
+      const searchConditions = generateSearchConditions(searchTerm, searchType)
+      
+      const { data: docsData, error: docsError, count: docsCountData } = await supabase
+        .from('documents')
+        .select('*', { count: 'exact' })
+        .eq('status', 'approved')
+        .or(searchConditions)
+        .range(offset, offset + limit - 1)
 
-    if (docsError) {
-      console.error('搜索文献失败:', docsError)
-      res.status(500).json({ error: '搜索文献失败', details: docsError })
-      return
+      if (docsError) {
+        console.error('搜索文献失败:', docsError)
+        res.status(500).json({ error: '搜索文献失败', details: docsError })
+        return
+      }
+      
+      docs = docsData || []
+      docsCount = docsCountData || 0
     }
 
     let dictionaryResults: { id: string; word: string; page: number; definition: string }[] = []
