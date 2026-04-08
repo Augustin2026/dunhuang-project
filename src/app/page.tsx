@@ -622,6 +622,17 @@ const Page = () => {
                 onChange={setContent}
                 className="border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 style={{ fontFamily: 'inherit' }}
+                modules={{
+                  clipboard: {
+                    matchVisual: false
+                  }
+                }}
+                formats={[
+                  'header', 'font', 'size',
+                  'bold', 'italic', 'underline', 'strike', 'blockquote',
+                  'list', 'bullet', 'indent',
+                  'link', 'image', 'video'
+                ]}
               />
             </div>
             <p className="mt-2 text-xs text-gray-400">

@@ -78,3 +78,11 @@ body {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-bronze via-accent-gold to-accent-bronze;
   }
 }
+
+.ql-editor {
+  font-family: 'Hanazono Mincho', 'SimSun-ExtB', 'MingLiU-ExtB', 'Noto Sans SC', serif !important;
+}
+
+.ql-container {
+  font-family: 'Hanazono Mincho', 'SimSun-ExtB', 'MingLiU-ExtB', 'Noto Sans SC', serif !important;
+}
