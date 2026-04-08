@@ -428,14 +428,14 @@ const Page = () => {
               {/* 词典结果 */}
               {dictionaryResults.length > 0 && (
                 <div>
-                  <h3 className="text-xl font-bold mb-4 text-ink-800">词典 ({dictionaryResults.length}条)</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <h3 className="text-lg font-bold mb-3 text-ink-800">词典 ({dictionaryResults.length}条)</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3">
                     {(showMoreDictionary ? dictionaryResults : dictionaryResults.slice(0, resultsPerPage)).map((dict) => (
-                      <div key={dict.id} className="bg-white rounded-xl shadow-sm p-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                        <h4 className="text-lg font-bold text-ink-900 mb-2">
+                      <div key={dict.id} className="bg-white rounded-lg shadow-sm p-3 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                        <h4 className="text-base font-bold text-ink-900 mb-1">
                           {highlightText(dict.word, searchTerm)}
                         </h4>
-                        <p className="text-gray-600 line-clamp-2 mb-3 text-sm">
+                        <p className="text-gray-600 line-clamp-2 mb-2 text-xs">
                           {highlightText(dict.definition, searchTerm)}
                         </p>
                         <div className="flex justify-end">
@@ -444,7 +444,7 @@ const Page = () => {
                               setCurrentImagePage(dict.page || 1)
                               setShowImageViewer(true)
                             }}
-                            className="px-3 py-1.5 bg-amber-700 hover:bg-amber-800 text-white rounded-lg transition-all duration-300 text-sm"
+                            className="px-2 py-1 bg-amber-700 hover:bg-amber-800 text-white rounded-md transition-all duration-300 text-xs"
                           >
                             查看原典
                           </button>
@@ -453,10 +453,10 @@ const Page = () => {
                     ))}
                   </div>
                   {dictionaryResults.length > resultsPerPage && !showMoreDictionary && (
-                    <div className="mt-4 text-center">
+                    <div className="mt-3 text-center">
                       <button
                         onClick={() => setShowMoreDictionary(true)}
-                        className="px-4 py-2 bg-ink-800 hover:bg-ink-900 text-white rounded-lg transition-all duration-300"
+                        className="px-3 py-1.5 bg-ink-800 hover:bg-ink-900 text-white rounded-lg transition-all duration-300 text-sm"
                       >
                         查看更多
                       </button>
