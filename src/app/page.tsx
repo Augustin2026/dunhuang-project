@@ -635,7 +635,26 @@ const Page = () => {
                   const text = value.replace(/<[^>]*>/g, '')
                   console.log('Raw HTML:', value)
                   console.log('Plain text:', text)
-                  console.log('Uint16Array:', new Uint16Array(text.split('').map(c => c.charCodeAt(0))))
+                  
+                  const hexCodes = []
+                  for (let i = 0; i < text.length; i++) {
+                    const codePoint = text.codePointAt(i)
+                    if (codePoint) {
+                      hexCodes.push(`\\u${codePoint.toString(16).toUpperCase().padStart(4, '0')}`)
+                      if (codePoint > 0xFFFF) {
+                        i++
+                      }
+                    }
+                  }
+                  console.log('Hex Codes:', hexCodes.join(' '))
+                  
+                  const uint16Array = []
+                  for (let i = 0; i < text.length; i++) {
+                    const charCode = text.charCodeAt(i)
+                    uint16Array.push(charCode)
+                  }
+                  console.log('Uint16Array:', new Uint16Array(uint16Array))
+                  
                   setContent(value)
                 }}
                 className="border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
