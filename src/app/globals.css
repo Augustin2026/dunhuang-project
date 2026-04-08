@@ -83,10 +83,15 @@ body {
   [contenteditable="true"] {
     font-family: 'Hanazono Mincho', 'SimSun-ExtB', 'MingLiU-ExtB', 'Noto Sans SC', serif !important;
     font-variant-east-asian: full-width !important;
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-feature-settings: 'liga' 1, 'calt' 1;
+    -moz-font-feature-settings: 'liga' 1, 'calt' 1;
+    font-feature-settings: 'liga' 1, 'calt' 1;
   }
   
   .ql-font-hanazono {
     font-family: 'Hanazono Mincho', 'SimSun-ExtB', 'MingLiU-ExtB', 'Noto Sans SC', serif !important;
+    text-rendering: optimizeLegibility !important;
   }
   
   .ql-font-sans {

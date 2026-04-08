@@ -628,10 +628,16 @@ const Page = () => {
             <label className="block text-sm font-medium text-ink-700 mb-1">
               释文 *
             </label>
-            <div className="font-serif">
+            <div className="font-serif" style={{ textRendering: 'optimizeLegibility' }}>
               <ReactQuill
                 value={content}
-                onChange={setContent}
+                onChange={(value) => {
+                  const text = value.replace(/<[^>]*>/g, '')
+                  console.log('Raw HTML:', value)
+                  console.log('Plain text:', text)
+                  console.log('Uint16Array:', new Uint16Array(text.split('').map(c => c.charCodeAt(0))))
+                  setContent(value)
+                }}
                 className="border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 theme="snow"
                 modules={{
