@@ -429,7 +429,7 @@ const Page = () => {
               {dictionaryResults.length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold mb-3 text-ink-800">词典 ({dictionaryResults.length}条)</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                     {(showMoreDictionary ? dictionaryResults : dictionaryResults.slice(0, resultsPerPage)).map((dict) => (
                       <div key={dict.id} className="bg-white rounded-lg shadow-sm p-3 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                         <h4 className="text-base font-bold text-ink-900 mb-1">
@@ -444,9 +444,9 @@ const Page = () => {
                               setCurrentImagePage(dict.page || 1)
                               setShowImageViewer(true)
                             }}
-                            className="px-2 py-1 bg-amber-700 hover:bg-amber-800 text-white rounded-md transition-all duration-300 text-xs"
+                            className="w-8 h-8 bg-amber-700 hover:bg-amber-800 text-white rounded-md transition-all duration-300 text-xs flex items-center justify-center"
                           >
-                            查看原典
+                            查看
                           </button>
                         </div>
                       </div>
