@@ -6,7 +6,19 @@ import dynamic from 'next/dynamic'
 import { Search, BookOpen } from 'lucide-react'
 import * as OpenCC from 'opencc-js'
 
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
+const ReactQuill = dynamic(
+  async () => {
+    const { default: RQ } = await import('react-quill')
+    const Quill = (await import('quill')).default
+    
+    const Font = Quill.import('formats/font') as any
+    Font.whitelist = ['hanazono', 'sans', 'serif']
+    Quill.register(Font, true)
+    
+    return RQ
+  },
+  { ssr: false }
+)
 import 'react-quill/dist/quill.snow.css'
 
 // 初始化简繁转换实例
@@ -621,17 +633,24 @@ const Page = () => {
                 value={content}
                 onChange={setContent}
                 className="border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                style={{ fontFamily: 'inherit' }}
+                theme="snow"
                 modules={{
+                  toolbar: [
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    [{ 'font': ['hanazono', 'sans', 'serif'] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'indent': '-1'}, { 'indent': '+1' }],
+                    ['clean']
+                  ],
                   clipboard: {
                     matchVisual: false
                   }
                 }}
                 formats={[
-                  'header', 'font', 'size',
-                  'bold', 'italic', 'underline', 'strike', 'blockquote',
-                  'list', 'bullet', 'indent',
-                  'link', 'image', 'video'
+                  'header', 'font',
+                  'bold', 'italic', 'underline', 'strike',
+                  'list', 'bullet', 'indent'
                 ]}
               />
             </div>

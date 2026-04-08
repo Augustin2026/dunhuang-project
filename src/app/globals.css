@@ -84,4 +84,16 @@ body {
     font-family: 'Hanazono Mincho', 'SimSun-ExtB', 'MingLiU-ExtB', 'Noto Sans SC', serif !important;
     font-variant-east-asian: full-width !important;
   }
+  
+  .ql-font-hanazono {
+    font-family: 'Hanazono Mincho', 'SimSun-ExtB', 'MingLiU-ExtB', 'Noto Sans SC', serif !important;
+  }
+  
+  .ql-font-sans {
+    font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif !important;
+  }
+  
+  .ql-font-serif {
+    font-family: 'Noto Serif SC', 'SimSun', serif !important;
+  }
 }
