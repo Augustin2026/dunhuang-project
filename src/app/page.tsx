@@ -2,24 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import dynamic from 'next/dynamic'
 import { Search, BookOpen } from 'lucide-react'
 import * as OpenCC from 'opencc-js'
-
-const ReactQuill = dynamic(
-  async () => {
-    const { default: RQ } = await import('react-quill')
-    const Quill = (await import('quill')).default
-    
-    const Font = Quill.import('formats/font') as any
-    Font.whitelist = ['hanazono', 'sans', 'serif']
-    Quill.register(Font, true)
-    
-    return RQ
-  },
-  { ssr: false }
-)
-import 'react-quill/dist/quill.snow.css'
 
 // 初始化简繁转换实例
 const converterS2T = OpenCC.Converter({ from: 'cn', to: 'tw' })
@@ -628,57 +612,13 @@ const Page = () => {
             <label className="block text-sm font-medium text-ink-700 mb-1">
               释文 *
             </label>
-            <div className="font-serif" style={{ textRendering: 'optimizeLegibility' }}>
-              <ReactQuill
-                value={content}
-                onChange={(value) => {
-                  const text = value.replace(/<[^>]*>/g, '')
-                  console.log('Raw HTML:', value)
-                  console.log('Plain text:', text)
-                  
-                  const hexCodes = []
-                  for (let i = 0; i < text.length; i++) {
-                    const codePoint = text.codePointAt(i)
-                    if (codePoint) {
-                      hexCodes.push(`\\u${codePoint.toString(16).toUpperCase().padStart(4, '0')}`)
-                      if (codePoint > 0xFFFF) {
-                        i++
-                      }
-                    }
-                  }
-                  console.log('Hex Codes:', hexCodes.join(' '))
-                  
-                  const uint16Array = []
-                  for (let i = 0; i < text.length; i++) {
-                    const charCode = text.charCodeAt(i)
-                    uint16Array.push(charCode)
-                  }
-                  console.log('Uint16Array:', new Uint16Array(uint16Array))
-                  
-                  setContent(value)
-                }}
-                className="border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                theme="snow"
-                modules={{
-                  toolbar: [
-                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                    [{ 'font': ['hanazono', 'sans', 'serif'] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    [{ 'indent': '-1'}, { 'indent': '+1' }],
-                    ['clean']
-                  ],
-                  clipboard: {
-                    matchVisual: false
-                  }
-                }}
-                formats={[
-                  'header', 'font',
-                  'bold', 'italic', 'underline', 'strike',
-                  'list', 'bullet', 'indent'
-                ]}
-              />
-            </div>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={8}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent font-serif"
+              style={{ textRendering: 'optimizeLegibility' }}
+            />
             <p className="mt-2 text-xs text-gray-400">
               💡 提示：若部分敦煌/吐鲁番异体字显示为空白方块，这是由于您的设备字库不全。建议安装学术界通用的【花园明朝 (Hanazono Mincho)】或使用部件拼字法进行录入。
             </p>
