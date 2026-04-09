@@ -19,10 +19,11 @@ html {
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
+  background: linear-gradient(135deg, #faf9f7 0%, #f5f2ed 50%, #f0e8dc 100%);
   font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
 }
 
 @layer base {
