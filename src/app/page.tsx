@@ -483,10 +483,15 @@ const Page = () => {
                             <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">
                               {doc.document_number}
                             </span>
+                            {doc.page_number && (
+                              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                                {doc.page_number}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div className="mb-4">
-                          <p className="text-gray-600">
+                          <p className="text-gray-600 whitespace-pre-wrap">
                             {expandedDocs[doc.id] ? (
                               highlightHTML(doc.content, searchTerm)
                             ) : (
@@ -506,12 +511,6 @@ const Page = () => {
                           <div className="mb-4">
                             <h5 className="text-sm font-semibold text-ink-700 mb-1">文献注释:</h5>
                             <p className="text-gray-600 text-sm whitespace-pre-wrap">{highlightText(doc.comment, searchTerm)}</p>
-                          </div>
-                        )}
-                        {doc.page_number && (
-                          <div className="mb-4">
-                            <h5 className="text-sm font-semibold text-ink-700 mb-1">所在页码:</h5>
-                            <p className="text-gray-600 text-sm">{doc.page_number}</p>
                           </div>
                         )}
                         <div className="flex justify-end">
