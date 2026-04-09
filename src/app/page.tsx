@@ -58,11 +58,14 @@ const Page = () => {
             return
           }
 
+          // 立即清空上一次的搜索结果
+          setDocumentResults([])
+          setDictionaryResults([])
           setLoading(true)
           setShowResults(true)
           setShowMoreDocuments(false)
           setShowMoreDictionary(false)
-          console.log('设置加载状态为 true，显示结果为 true，重置显示更多状态')
+          console.log('清空搜索结果，设置加载状态为 true，显示结果为 true，重置显示更多状态')
 
           try {
             const apiUrl = `/api/search?q=${encodeURIComponent(query)}&page=1&type=${searchType}`
@@ -104,11 +107,14 @@ const Page = () => {
             return
           }
 
+          // 立即清空上一次的搜索结果
+          setDocumentResults([])
+          setDictionaryResults([])
           setLoading(true)
           setShowResults(true)
           setShowMoreDocuments(false)
           setShowMoreDictionary(false)
-          console.log('设置加载状态为 true，显示结果为 true，重置显示更多状态')
+          console.log('清空搜索结果，设置加载状态为 true，显示结果为 true，重置显示更多状态')
 
           try {
             const apiUrl = `/api/search?q=${encodeURIComponent(query)}&page=1&type=${searchType}`
