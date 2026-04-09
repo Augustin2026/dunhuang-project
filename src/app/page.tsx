@@ -37,7 +37,7 @@ const Page = () => {
   // 当页码变化且弹窗打开时，更新图片 URL 并设置加载状态为 true
   useEffect(() => {
     if (showImageViewer) {
-      const newImageUrl = `https://hpggnkatybvyqepogdcb.supabase.co/storage/v1/object/public/dictionary-pages/TuCi_${currentImagePage}.jpeg`
+      const newImageUrl = `https://hpggnkatybvyqepogdcb.supabase.co/storage/v1/object/public/dictionary-pages/TuCi_${currentImagePage}.jpeg?width=1200&format=webp`
       setImageUrl(newImageUrl)
       setIsLoading(true)
     }
