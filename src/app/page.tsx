@@ -426,8 +426,8 @@ const Page = () => {
 
       {/* 搜索结果 */}
       {showResults && (
-        <div className="container mx-auto px-4 py-8">
-          <h2 className="text-2xl font-bold mb-6 text-ink-800">搜索结果</h2>
+        <div className="container mx-auto px-4 py-16">
+          <h2 className="text-3xl font-bold mb-8 text-ink-800">搜索结果</h2>
           
           {loading ? (
             // 骨架屏加载效果
@@ -575,10 +575,10 @@ const Page = () => {
       )}
 
       {/* 文献上传 */}
-      <div className="container mx-auto px-4 py-16">
-        <h2 className="text-2xl font-bold mb-6 text-ink-800">上传文献</h2>
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div className="container mx-auto px-4 py-8">
+        <h2 className="text-xl font-bold mb-4 text-ink-800">上传文献</h2>
+        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-4 max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-ink-700 mb-1">
                 文献标题 *
@@ -602,7 +602,7 @@ const Page = () => {
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-ink-700 mb-1">
                 时代 *
@@ -626,33 +626,33 @@ const Page = () => {
               />
             </div>
           </div>
-          <div className="mb-6">
+          <div className="mb-4">
             <label className="block text-sm font-medium text-ink-700 mb-1">
               释文 *
             </label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              rows={8}
+              rows={6}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent font-serif"
               style={{ textRendering: 'optimizeLegibility' }}
             />
-            <p className="mt-2 text-xs text-gray-400">
+            <p className="mt-1 text-xs text-gray-400">
               💡 提示：若部分敦煌/吐鲁番异体字显示为空白方块，这是由于您的设备字库不全。建议安装学术界通用的【花园明朝 (Hanazono Mincho)】或使用部件拼字法进行录入。
             </p>
           </div>
-          <div className="mb-6">
+          <div className="mb-4">
             <label className="block text-sm font-medium text-ink-700 mb-1">
               文献注释
             </label>
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              rows={4}
+              rows={3}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-4">
             <div className="flex items-start">
               <div className="flex items-center h-5">
                 <input
