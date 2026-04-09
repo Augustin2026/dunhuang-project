@@ -34,12 +34,25 @@ const Page = () => {
     return () => clearTimeout(timer)
   }, [searchTerm])
 
+  // 预加载图片函数
+  const preloadImage = (pageNumber: number) => {
+    const imageUrl = `https://hpggnkatybvyqepogdcb.supabase.co/storage/v1/object/public/dictionary-pages/TuCi_${pageNumber}.jpeg`
+    const img = new Image()
+    img.src = imageUrl
+  }
+
   // 当页码变化且弹窗打开时，更新图片 URL 并设置加载状态为 true
   useEffect(() => {
     if (showImageViewer) {
       const newImageUrl = `https://hpggnkatybvyqepogdcb.supabase.co/storage/v1/object/public/dictionary-pages/TuCi_${currentImagePage}.jpeg`
       setImageUrl(newImageUrl)
       setIsLoading(true)
+      
+      // 预加载前后各2页的图片
+      preloadImage(currentImagePage - 2)
+      preloadImage(currentImagePage - 1)
+      preloadImage(currentImagePage + 1)
+      preloadImage(currentImagePage + 2)
     }
   }, [currentImagePage, showImageViewer])
 
@@ -803,7 +816,7 @@ const Page = () => {
                   />
                 )}
                 {isLoading && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center -z-10 text-stone-500">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-white/80 text-stone-500">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-700 mb-4"></div>
                     <p>加载中...</p>
                   </div>
