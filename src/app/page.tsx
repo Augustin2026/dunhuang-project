@@ -34,25 +34,12 @@ const Page = () => {
     return () => clearTimeout(timer)
   }, [searchTerm])
 
-  // 预加载图片函数
-  const preloadImage = (pageNumber: number) => {
-    const imageUrl = `https://img.turfanology.cloud/TuCi_${pageNumber}.jpg`
-    const img = new Image()
-    img.src = imageUrl
-  }
-
   // 当页码变化且弹窗打开时，更新图片 URL 并设置加载状态为 true
   useEffect(() => {
     if (showImageViewer) {
       const newImageUrl = `https://img.turfanology.cloud/TuCi_${currentImagePage}.jpg`
       setImageUrl(newImageUrl)
       setIsLoading(true)
-      
-      // 预加载前后各2页的图片
-      preloadImage(currentImagePage - 2)
-      preloadImage(currentImagePage - 1)
-      preloadImage(currentImagePage + 1)
-      preloadImage(currentImagePage + 2)
     }
   }, [currentImagePage, showImageViewer])
 
