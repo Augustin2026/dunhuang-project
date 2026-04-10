@@ -36,7 +36,7 @@ const Page = () => {
 
   // 预加载图片函数
   const preloadImage = (pageNumber: number) => {
-    const imageUrl = `https://hpggnkatybvyqepogdcb.supabase.co/storage/v1/object/public/dictionary-pages/TuCi_${pageNumber}.jpg`
+    const imageUrl = `https://pub-3594acac84df47b295a30ca2749a3769.r2.dev/TuCi_${pageNumber}.jpg`
     const img = new Image()
     img.src = imageUrl
   }
@@ -44,7 +44,7 @@ const Page = () => {
   // 当页码变化且弹窗打开时，更新图片 URL 并设置加载状态为 true
   useEffect(() => {
     if (showImageViewer) {
-      const newImageUrl = `https://hpggnkatybvyqepogdcb.supabase.co/storage/v1/object/public/dictionary-pages/TuCi_${currentImagePage}.jpg`
+      const newImageUrl = `https://pub-3594acac84df47b295a30ca2749a3769.r2.dev/TuCi_${currentImagePage}.jpg`
       setImageUrl(newImageUrl)
       setIsLoading(true)
       
