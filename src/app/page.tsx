@@ -43,110 +43,57 @@ const Page = () => {
     }
   }, [currentImagePage, showImageViewer])
 
-  // 使用 useCallback 来 memoize 搜索函数
-  const memoizedHandleSearch = useCallback(async (event?: React.MouseEvent | string) => {
-    // 检查是否是鼠标事件
-    if (event && typeof event === 'object' && 'preventDefault' in event) {
-      event.preventDefault()
-      // 从状态中获取搜索词
-      const query = searchTerm
-      console.log('开始搜索，搜索词:', query, '搜索类型:', searchType)
-          
-          // 检查 query 是否是字符串类型
-          if (typeof query !== 'string' || !query.trim()) {
-            console.log('搜索词为空或不是字符串，取消搜索')
-            return
-          }
-
-          // 立即清空上一次的搜索结果
-          setDocumentResults([])
-          setDictionaryResults([])
-          setLoading(true)
-          setShowResults(true)
-          setShowMoreDocuments(false)
-          setShowMoreDictionary(false)
-          console.log('清空搜索结果，设置加载状态为 true，显示结果为 true，重置显示更多状态')
-
-          try {
-            const apiUrl = `/api/search?q=${encodeURIComponent(query)}&page=1&type=${searchType}`
-            console.log('发起 API 请求，URL:', apiUrl)
-            const response = await fetch(apiUrl)
-        console.log('API 响应状态:', response.status)
+  // 搜索函数
+  const handleSearch = async () => {
+    // 从状态中获取搜索词
+    const query = searchTerm
+    console.log('开始搜索，搜索词:', query, '搜索类型:', searchType)
         
-        const data = await response.json()
-        console.log('API 响应数据:', data)
-
-        if (data.error) {
-          console.error('搜索失败:', data.error)
-          setDocumentResults([])
-          setDictionaryResults([])
-          console.log('设置搜索结果为空数组')
-        } else {
-          console.log('搜索成功，文献结果数量:', data.documents?.length || 0)
-          console.log('搜索成功，词典结果数量:', data.dictionary?.length || 0)
-          setDocumentResults(data.documents || [])
-          setDictionaryResults(data.dictionary || [])
+        // 检查 query 是否是字符串类型
+        if (typeof query !== 'string' || !query.trim()) {
+          console.log('搜索词为空或不是字符串，取消搜索')
+          return
         }
-      } catch (error) {
-        console.error('搜索失败:', error)
+
+        // 立即清空上一次的搜索结果
+        setDocumentResults([])
+        setDictionaryResults([])
+        setLoading(true)
+        setShowResults(true)
+        setShowMoreDocuments(false)
+        setShowMoreDictionary(false)
+        console.log('清空搜索结果，设置加载状态为 true，显示结果为 true，重置显示更多状态')
+
+        try {
+          const apiUrl = `/api/search?q=${encodeURIComponent(query)}&page=1&type=${searchType}`
+          console.log('发起 API 请求，URL:', apiUrl)
+          const response = await fetch(apiUrl)
+      console.log('API 响应状态:', response.status)
+      
+      const data = await response.json()
+      console.log('API 响应数据:', data)
+
+      if (data.error) {
+        console.error('搜索失败:', data.error)
         setDocumentResults([])
         setDictionaryResults([])
         console.log('设置搜索结果为空数组')
-      } finally {
-        setLoading(false)
-        console.log('设置加载状态为 false')
+      } else {
+        console.log('搜索成功，文献结果数量:', data.documents?.length || 0)
+        console.log('搜索成功，词典结果数量:', data.dictionary?.length || 0)
+        setDocumentResults(data.documents || [])
+        setDictionaryResults(data.dictionary || [])
       }
-    } else {
-      // 处理字符串参数
-      const query = typeof event === 'string' ? event : searchTerm
-      console.log('开始搜索，搜索词:', query, '搜索类型:', searchType)
-          
-          // 检查 query 是否是字符串类型
-          if (typeof query !== 'string' || !query.trim()) {
-            console.log('搜索词为空或不是字符串，取消搜索')
-            return
-          }
-
-          // 立即清空上一次的搜索结果
-          setDocumentResults([])
-          setDictionaryResults([])
-          setLoading(true)
-          setShowResults(true)
-          setShowMoreDocuments(false)
-          setShowMoreDictionary(false)
-          console.log('清空搜索结果，设置加载状态为 true，显示结果为 true，重置显示更多状态')
-
-          try {
-            const apiUrl = `/api/search?q=${encodeURIComponent(query)}&page=1&type=${searchType}`
-            console.log('发起 API 请求，URL:', apiUrl)
-            const response = await fetch(apiUrl)
-        console.log('API 响应状态:', response.status)
-        
-        const data = await response.json()
-        console.log('API 响应数据:', data)
-
-        if (data.error) {
-          console.error('搜索失败:', data.error)
-          setDocumentResults([])
-          setDictionaryResults([])
-          console.log('设置搜索结果为空数组')
-        } else {
-          console.log('搜索成功，文献结果数量:', data.documents?.length || 0)
-          console.log('搜索成功，词典结果数量:', data.dictionary?.length || 0)
-          setDocumentResults(data.documents || [])
-          setDictionaryResults(data.dictionary || [])
-        }
-      } catch (error) {
-        console.error('搜索失败:', error)
-        setDocumentResults([])
-        setDictionaryResults([])
-        console.log('设置搜索结果为空数组')
-      } finally {
-        setLoading(false)
-        console.log('设置加载状态为 false')
-      }
+    } catch (error) {
+      console.error('搜索失败:', error)
+      setDocumentResults([])
+      setDictionaryResults([])
+      console.log('设置搜索结果为空数组')
+    } finally {
+      setLoading(false)
+      console.log('设置加载状态为 false')
     }
-  }, [searchTerm, searchType])
+  }
 
   
 
@@ -163,7 +110,7 @@ const Page = () => {
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      memoizedHandleSearch()
+      handleSearch()
     }
   }
 
@@ -371,7 +318,7 @@ const Page = () => {
               className="w-full px-6 py-4 pr-16 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent shadow-md"
             />
             <button
-              onClick={memoizedHandleSearch}
+              onClick={handleSearch}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-ink-800 text-white p-4 rounded-full hover:bg-ink-900 transition-all duration-300 shadow-md hover:shadow-lg active:scale-95"
             >
               <Search size={20} />
