@@ -148,12 +148,7 @@ const Page = () => {
     }
   }, [searchTerm, searchType])
 
-  // 当防抖搜索词变化时触发搜索
-  useEffect(() => {
-    if (debouncedSearchTerm.trim()) {
-      memoizedHandleSearch(debouncedSearchTerm)
-    }
-  }, [debouncedSearchTerm, memoizedHandleSearch])
+  
 
 
 
