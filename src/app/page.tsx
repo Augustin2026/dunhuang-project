@@ -159,7 +159,7 @@ const Page = () => {
         console.log('设置加载状态为 false')
       }
     }
-  }, [searchTerm, searchType, setLoading, setShowResults, setDocumentResults, setDictionaryResults])
+  }, [searchTerm, searchType])
 
   // 当防抖搜索词变化时触发搜索
   useEffect(() => {
